@@ -1,0 +1,2 @@
+# Megamercado
+Sistema de inventario 🧾📈🗃
