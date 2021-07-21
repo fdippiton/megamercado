@@ -1,1 +1,0 @@
-# Modulo de registro de proveedores

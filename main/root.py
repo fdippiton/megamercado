@@ -1,19 +1,33 @@
+#from tkinter import ttk
 import tkinter as tk
-from Reportes import *
-from Entradas import *
+from tkinter import ttk
+from tkinter.font import families
+from index_view import main_view as mv # Importacion del template header
+
+class Application:
+    def __init__(self, master):
+        self.main_win = master 
+        self.main_win.title('Registrar producto')
+        self.main_win.geometry('1200x600')
+        self.main_win.configure(bg='White')
+
+        # Creating Frames
+        header_main_page = tk.Frame(self.main_win)
+        header_main_page.grid(column=0, row=0)
+
+        menu_main_page = tk.Frame(self.main_win)
+        menu_main_page.grid(column=0, row=1)
+
+        # Importacion del objeto header y pasarle el frame en donde estara
+        header = mv(header_main_page)
+        header.main_page_view()
 
 
-class App(tk.Frame):
-    def __init__(self, master=None):
-        tk.Frame.__init__(self, master)
-        self.grid()
+if __name__ == '__main__':
+    master = tk.Tk()
+    _App = Application(master)
+    master.mainloop()
+    
 
-        top=self.winfo_toplevel()
-        top.resizable(height=None, width=None)
 
- 
 
-App_instance = App()
-App_instance.master.title('Megamercado')
-App_instance.master.geometry('500x400')
-App_instance.mainloop()
