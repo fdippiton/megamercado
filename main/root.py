@@ -6,6 +6,35 @@ from typing import Text
 from index_view import main_view as mv # Importacion del template header()
 from Productos.gen_prod import reg_prod_view as rp
 
+
+
+""" Definir los frames con la estructura siguiente:
+
+        self.NombreFrame = tk.Frame(self.main_win)
+        self.NombreFrame.grid(column=1, row=1) Si es un frame dentro content
+        self.NombreFrame.grid(column=#, row=#) Si es otro tipo de frame
+
+    Importar los modulos
+    from NombreCarpeta.NombreArchivo import nombreFuncion as abreviacion
+    Ejemplo:  from Productos.gen_prod import reg_prod_view as rp
+
+    Creacion de funciones para mostrar los modulos
+
+    NombreFrame es el lugar en donde se colocara el contenido
+    def NombreFuncion(self):
+        self.NombreFrame.grid_forget()  #Para limpiar el contenido anterior
+        self.NombreFrame.grid()         #Para mostrar el contenido nuevo en ese espacio
+        self._reg = rp(self.NombreFrame) # Instanciar la clase o modulo
+        self._reg.reg_prod()                   # Llamar metodo de la clase
+
+    Ejemplo: 
+    def show_reg_prod(self):
+        self.content_main_page.grid_forget()
+        self.content_main_page.grid()
+        self._reg = rp(self.content_main_page)
+        self._reg.reg_prod()
+
+"""
 class Application:
     def __init__(self, master):
         self.main_win = master 
@@ -42,10 +71,10 @@ class Application:
 
     # Mostrar registro de produto
     def show_reg_prod(self):
-        self.content_main_page.grid_forget()
-        self.content_main_page.grid()
-        self._reg = rp(self.content_main_page)
-        self._reg.reg_prod()
+        self.content_main_page.grid_forget()    # Borrar el contenido anterior de ese espacio
+        self.content_main_page.grid()           # Mostrar ese mismo frame vacio
+        self._reg = rp(self.content_main_page)  # Llamar e instaciar la clase que contiene la plantilla de registro de producto y pasarle el lugar donde la quiero poner
+        self._reg.reg_prod()                    # Llamar el metodo que contiene la plantilla
 
 
 
