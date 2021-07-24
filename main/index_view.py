@@ -6,12 +6,21 @@ from tkinter import ttk
 from tkinter.font import families
 
 
-class main_view():
-    def __init__(self, _frame):
-        self._frame = _frame
+class main_bar():
+    def __init__(self, _frameLogo, _frameUser):
+        self._frameLogo = _frameLogo
+        self._frameUser = _frameUser
 
-    def main_page_view(self):
+    def main_bar_view(self):
         # Creating title megamercado
-        self.main_title_reg_pro = tk.Label(self._frame, text='MegaMercado', font=('Segoe UI semibold', 15), bg='#16ADB2', fg='white', width=150, anchor='s')
-        self.main_title_reg_pro.grid(row=0, column=0, sticky='ew', ipady=10)
+        self.main_title_reg_pro = tk.Label(self._frameLogo, text='MEGAMERCADO', font=('Roboto Mono Bold', 15), bg='#37648B', fg='white')
+        self.main_title_reg_pro.grid()
+        
+
+        self.user_log = tk.Label(self._frameUser, text='Usuario ADM', font=('Roboto Mono Bold', 15), bg='#37648B', fg='white')
+        self.user_log.grid()
+
+
+
+
 
