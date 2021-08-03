@@ -2,22 +2,17 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import families
-#from pil import ImageTk, Image
-#from assets import *
 
 
-
+# PAGE 1 - Registrarse
 class register_view():
     def __init__(self, _frameLeft, _frameRight):
         self._frameLeft = _frameLeft
         self. _frameRight =  _frameRight
-       # self._image = "C:\\Users\\MSI\\desktop\\Megamercado\\Megamercado\\main\\assets"
 
     def register_users(self):
         self._logo_image = tk.PhotoImage(file='../megaImage.gif', width=600)
         self._image_label = tk.Label(self._frameLeft, image=self._logo_image, width=600,  height=600, bg='white').grid(column=0, row=0)
-        #self._logo_image = tk.PhotoImage(self._frameLeft, file='C:\\Users\\MSI\\desktop\\Megamercado\\Megamercado\\main\\assets\\megaImage.gif')
-        #self._logo_image.grid()
 
         # Register title
         self.register_title = tk.Label(self._frameRight, text='Registrar', font=('Roboto Mono Bold', 15), bg='white', width=50, height=2, anchor='n')

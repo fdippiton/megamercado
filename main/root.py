@@ -1,14 +1,18 @@
 #from tkinter import ttk
 import tkinter as tk
-from tkinter import Label, Menu, ttk
-from tkinter.constants import S
+from tkinter import Label, Menu, Menubutton, ttk
+from tkinter.constants import ANCHOR, COMMAND, RAISED, S
 from tkinter.font import families
 from fonts import *
 from typing import Text
-from index_view import main_bar  # Importacion del template header()
-from Productos.gen_prod import reg_prod_view as rp
-from Registrar.register_main import register_view
-
+from index_view import main_bar  # Template header
+from Productos.gen_prod import reg_prod_view as rp # Template registro de producto
+from Productos.list_prod import listar_prod as lp # Template listar productos
+from Productos.list_prod_alm import listar_prod_alm  # Template listar productos
+from Productos.all_prod import _products             # Productos 
+from Ventas.rpt_ventas import rpt_ventas
+from Registrar.register_main import register_view # Template principal registrar usuarios
+from Clientes.cli import listar_clientes
 
 
 """ Definir los frames con la estructura siguiente:
@@ -46,107 +50,207 @@ class Application:
         self.main_win.rowconfigure(0, weight=1)
         self.main_win.columnconfigure(0, weight=1)
         self.main_win.configure(bg='white')
-        # CREATING FRAMES
         
-        # Page 1 / Registro de Administrador-cliente-proveedor frames
+
+        # CREACION DE FRAMES
+        
+#   -------------------------- PAGE 1 ----------------------------------------------
+        # Registro de Administrador-cliente-proveedor frames
         # Frame container
-        self.container = tk.Frame(self.main_win, width=1200, height=600, bg='white')
+        self.container = tk.Frame(self.main_win, width=1200, height=600, bg='yellow')
         self.container.grid(row=0, column=0)
-        #Frame logo image
+        
+        #Frame de la imagen del logo
         self.logo_image = tk.Frame(self.container, width=600, height=600, bg='white')
         self.logo_image.grid(row=0, column=0)
+        
         # Frame registrar
         self.register = tk.Frame(self.container, width=600, height=600, bg='white')
         self.register.grid(row=0, column=1)
 
+        # FUNCION QUE EJECUTA LA PAGINA 1
         #self.main_register = register_view(self.logo_image, self.register)
         #self.main_register.register_users()
 
-        # Page 2 Frames - Registrar adm
+# ----------------------------- PAGE 2 --------------------------------------
 
-        # Page 3 Frames - Registrar cliente
+        # Frames - Registrar adm
 
+# ----------------------------- PAGE 3 ---------------------------------------
+        # Frames - Registrar cliente
+
+
+# ----------------------------- PAGE 4 ---------------------------------------
         # Page 4 Frames - Registrar proveedor
 
+
+# ----------------------------- PAGE 5 ---------------------------------------
         # Page 5 Frames - Iniciar sesion adm
 
-        # Page Main Frames
-            # Main page container
+
+
+# ----------------------------- PAGINA PRINCIPAL ---------------------------------------
+    # Page Main Frames
+            # Contenedor de la pagina principal
         self.main_page_container = tk.Frame(self.main_win, width=1200, height=600, bg='#37648B')
         self.main_page_container.grid()
 
-            # Top bar logo
-        self.top_bar_logo = tk.Frame(self.main_page_container, width=200, height=80, bg='#37648B')
+            # Contenedor del logo 'MEGAMERCADO' de la barra superior
+        self.top_bar_logo = tk.Frame(self.main_page_container, width=200, height=30, bg='#37648B')
         self.top_bar_logo.grid(row=0, column=0, pady=24)
             
-            # Top bar user
-        self.top_bar_user = tk.Frame(self.main_page_container, width=1000, height=80, bg='#37648B')
-        self.top_bar_user.grid(row=0, column=1, sticky='e', padx=30)
+            # Contendor de la barra superior 
+        self.top_bar_user = tk.Frame(self.main_page_container, width=1000, height=30, bg='#37648B')
+        self.top_bar_user.grid(row=0, column=1, sticky='e', padx=20)
 
-            # Menu Frame
-        self.menu_frame = tk.Frame(self.main_page_container, width=200, height=520, bg='#37648B')
-        self.menu_frame.grid(row=1, column=0)
+            # Contenedor del Menu 
+        self.menu_frame = tk.Frame(self.main_page_container, width=200, height=570, bg='#37648B')
+        self.menu_frame.grid(row=1, column=0, sticky='n', pady=30)
 
-            # Main content
-        self.main_content = tk.Frame(self.main_page_container, width=1000, height=520, bg='white')
+            # Contenedor del contenido principal - Main content
+        self.main_content = tk.Frame(self.main_page_container, width=1000, height=570, bg='white')
         self.main_content.grid(row=1, column=1)
 
 
+    # Implementacion del template - Barra superior
         self.header = main_bar(self.top_bar_logo, self.top_bar_user)
         self.header.main_bar_view()
 
-            # Menu
-        self.menu_treeview = ttk.Treeview(self.menu_frame, height=25)
-        self.style = ttk.Style()
-        self.style.configure('Treeview', font=('Roboto Mono', 10), background='#37648B')
-        self.menu_treeview.grid()
+
+# -------------------------------- MENU ---------------------------------------------------
+        # MENU BAR
+        self.btn_inicio = tk.Button(self.menu_frame, text='Inicio', command=self.main_view, font=('Roboto Mono', 10), borderwidth=2)
+        self.btn_inicio.grid(padx=40, pady=10, ipadx=47, ipady=5)
         
-        self.ag_prod = self.menu_treeview.insert('', tk.END, text='Productos')
-        self.menu_treeview.insert(self.ag_prod, tk.END, text='Añadir producto')
-        self.menu_treeview.insert(self.ag_prod, tk.END, text='Listar productos')
-        self.menu_treeview.insert(self.ag_prod, tk.END, text='Listar productos x almacen')
+        # Productos menu
+        self.menu_prod = tk.Menubutton(self.menu_frame, text='Productos', relief=RAISED, font=('Roboto Mono', 10), borderwidth=2)
+        self.menu_prod.grid( pady=10, ipadx=35, ipady=5)
+
+        self.menu_prod.menu = tk.Menu(self.menu_prod, tearoff=0)
+        self.menu_prod['menu'] = self.menu_prod.menu
+
+        self.ag_prod = tk.IntVar()
+        self.lis_prod = tk.IntVar()
+        self.all_prods = tk.IntVar()
+        self.menu_prod.menu.add_checkbutton(label='Añadir productos', variable=self.ag_prod, command=self.show_reg_prod, font=('Roboto Mono', 9))
+        self.menu_prod.menu.add_checkbutton(label='Editar productos', variable=self.all_prods, font=('Roboto Mono', 9), command=self.show_all_prod)
+        self.menu_prod.menu.add_checkbutton(label='Listar productos', variable=self.lis_prod, command=self.show_list_prod, font=('Roboto Mono', 9))
+        self.menu_prod.menu.add_checkbutton(label='Listar productos x almacén', variable=self.lis_prod, font=('Roboto Mono', 9), command=self.show_list_prod_alm)
+
+        # Pedidos
+        self.menu_ped = tk.Menubutton(self.menu_frame, text='Pedidos', relief=RAISED, font=('Roboto Mono', 10), borderwidth=2)
+        self.menu_ped.grid( pady=10, ipadx=45, ipady=5)
+
+        self.menu_ped.menu = tk.Menu(self.menu_ped, tearoff=0)
+        self.menu_ped['menu'] = self.menu_ped.menu
+
+        self.cr_ped = tk.IntVar()
+        self.lis_ped = tk.IntVar()
+        self.menu_ped.menu.add_checkbutton(label='Crear pedido', variable=self.cr_ped, font=('Roboto Mono', 9))
+        self.menu_ped.menu.add_checkbutton(label='Listar pedidos', variable=self.lis_ped,  font=('Roboto Mono', 9))
         
-        self.ped = self.menu_treeview.insert('', tk.END, text='Pedidos')
-        self.menu_treeview.insert(self.ped, tk.END, text='Crear pedido')
-        self.menu_treeview.insert(self.ped, tk.END, text='Listar pedidos')
-        
-        self.ventas = self.menu_treeview.insert('', tk.END, text='Ventas')
-        self.menu_treeview.insert(self.ventas, tk.END, text='Reporte de ventas')
-        
-        self.facturacion = self.menu_treeview.insert('', tk.END, text='Facturacion')
-        self.menu_treeview.insert(self.facturacion, tk.END, text='Generar factura')
-        self.menu_treeview.insert(self.facturacion, tk.END, text='Listar facturas')
+        # Ventas
+        self.menu_ven = tk.Menubutton(self.menu_frame, text='Ventas', relief=RAISED,  font=('Roboto Mono', 10), borderwidth=2)
+        self.menu_ven.grid( pady=10, ipadx=50, ipady=5)
+
+        self.menu_ven.menu = tk.Menu(self.menu_ven, tearoff=0)
+        self.menu_ven['menu'] = self.menu_ven.menu
+
+        self.rpt_ven = tk.IntVar()
+        self.menu_ven.menu.add_checkbutton(label='Reporte de ventas', variable=self.rpt_ven,  font=('Roboto Mono', 9), command=self.show_rpt_ventas)
+
+        # Facturacion
+        self.menu_fac = tk.Menubutton(self.menu_frame, text='Facturacion', relief=RAISED, font=('Roboto Mono', 10), borderwidth=2)
+        self.menu_fac.grid( pady=10, ipadx=27, ipady=5)
+
+        self.menu_fac.menu = tk.Menu(self.menu_fac, tearoff=0)
+        self.menu_fac['menu'] = self.menu_fac.menu
+
+        self.gen_fact = tk.IntVar()
+        self.lis_fact = tk.IntVar()
+        self.menu_fac.menu.add_checkbutton(label='Generar factura', variable=self.gen_fact,  font=('Roboto Mono', 9))
+        self.menu_fac.menu.add_checkbutton(label='Listar factura', variable=self.lis_fact,  font=('Roboto Mono', 9))
+       
         
 
+    # IMPLEMENTACION DE LA VISTA PRINCIPAL
+        self.main_view()
 
-        # EN PROCESO DE DESARROLLO
-            # Main content
-        self.left_btn_frame = tk.Frame(self.main_content, width=500, height=80)
-        self.left_btn_frame.grid(row=0, column=0, sticky='e')
-        self.right_btn_frame = tk.Frame(self.main_content, width=500, height=80)
-        self.right_btn_frame.grid(row=0, column=1, sticky='w')
 
-        self.clients = tk.Button(self.left_btn_frame, text='Clientes')
-        self.clients.grid()
-        self.suppliers = tk.Button(self.right_btn_frame, text='Proveedores')
-        self.suppliers.grid()
-        self.suppliers = tk.Button(self.main_content, text='Almacen')
-        self.suppliers.grid(row=1, column=0, columnspan=2, padx=350, pady=30)
-        self.logo_title = tk.Label(self.main_content, text='MEGAMERCADO')
-        self.logo_title.grid(padx=350, pady=30)
-        self.logo_title_inf = tk.Label(self.main_content, text='Calidad y Confianza')
-        self.logo_title_inf.grid(padx=350, pady=30) 
+# ----------------- FUNCIONES PARA MOSTRAR LAS DEMAS VISTAS ---------------------------------
 
+    # Muestra la imagen del logo y lema
+    def ImageLogo(self):
+        self.frame1 = tk.Frame(self.main_content, bg='white', width=550)
+        self.frame1.place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.label1 = tk.Label(self.frame1,text="MEGAMERCADO", font=('Roboto Mono', 40), bg='white').place(relx=0.50, rely=0.70)		
+        self.label2 = tk.Label(self.frame1,text="Calidad y Confianza", font=('Roboto Mono', 20), bg='white').place(relx=0.53, rely=0.83)
+    
+    # Muestran los botones de clientes, Proveedores y almacen
+    def button(self):
+        self.Btn1 = tk.Button(self.frame1,text="Clientes",bg="#ADC6DB",font=('Roboto Mono Bold', 15), command=self.show_all_cli, relief="sunken",width=18,height=3,borderwidth=3).place(relx=0.20,rely=0.20)
+        self.Btn2 = tk.Button(self.frame1,text="Proveedores",bg="#ADC6DB",font=('Roboto Mono Bold', 15),relief="sunken",width=18,height=3,borderwidth=3).place(relx=0.50,rely=0.20)
+        self.Btn3 = tk.Button(self.frame1,text="Almacén",bg="#ADC6DB",font=('Roboto Mono Bold', 15),relief="sunken",width=18,height=3,borderwidth=3).place(relx=0.35,rely=0.45)
         
 
-    # Mostrar registro de producto
-   
+    # Mostrar registrar producto
     def show_reg_prod(self):
-        self.content_main_page.grid_forget()    # Borrar el contenido anterior de ese espacio
-        self.content_main_page.grid()           # Mostrar ese mismo frame vacio
-        self._reg = rp(self.content_main_page)  # Llamar e instaciar la clase que contiene la plantilla de registro de producto y pasarle el lugar donde la quiero poner
-        self._reg.reg_prod()                    # Llamar el metodo que contiene la plantilla
+        self.remove_frames()  # Limpia el frame main-content
+        self.main_content.grid() # Muestra el main-content limpio
+        self._reg = rp(self.main_content)  # Instaciar la clase que contiene la vista y pasarle el frame en que se mostrara
+        self._reg.reg_prod() #Mostrar la vista en el frame
 
+    # Mostrar todos los productos resumido
+    def show_all_prod(self):
+        self.remove_frames()
+        self.main_content.grid()
+        self._pro = _products(self.main_content)   
+        self._pro.prod_titles()   
+        self._pro.show_prod()          
+
+    # Mostrar la lista de productos
+    def show_list_prod(self):
+        self.remove_frames()
+        self.main_content.grid()    
+        self._lis = lp(self.main_content)  
+        self._lis.list_prod()
+        self._lis.show_list()
+    
+     # Mostrar la lista de productos x almacen
+    def show_list_prod_alm(self):
+        self.remove_frames()
+        self.main_content.grid()    
+        self._lis_alm = listar_prod_alm(self.main_content)  
+        self._lis_alm.list_prod_alm()
+        self._lis_alm.show_list_prod_alm()
+
+    # Mostar reporte de ventas
+    def show_rpt_ventas(self):
+        self.remove_frames()
+        self.main_content.grid()   
+        self.rpt = rpt_ventas(self.main_content)
+        self.rpt.rpt_ventas_title()
+        self.rpt.show_rpt_ventas()
+        
+    # Mostrar la vista principal
+    def main_view(self):
+        self.remove_frames()
+        self.main_content.grid()
+        self.ImageLogo()
+        self.button()
+
+    # Mostrar la lista de clientes
+    def show_all_cli(self):
+        self.remove_frames()
+        self.main_content.grid()
+        self._cli = listar_clientes(self.main_content)
+        self._cli.list_cli_title()
+        self._cli.show_list_cli()
+
+    # Limpiar el main-content frame principal
+    def remove_frames(self):
+        for widget in self.main_content.winfo_children(): # Toma todos los widgets de ese frame
+            widget.destroy()                             # Destruye los widgets
 
         
 if __name__ == '__main__':
