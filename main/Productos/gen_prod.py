@@ -115,8 +115,7 @@ class reg_prod_view():
         self.Prod_CostoUnidad.set('')
         self.Prod_ITBIS.set('')
 
-
-
+    # Validacion de codigo
     def validar_codigo(self, _input):
         self.input = _input
 
@@ -153,6 +152,7 @@ class reg_prod_view():
                     self.valid_values = False
                     return False
 
+    # Validacion de nombre
     def validar_nombre(self, _input):
         self.input = _input
         self.len_input = len(self.input)
@@ -169,6 +169,7 @@ class reg_prod_view():
             self.valid_values = True
             return True
 
+    # Validacion de precio
     def validar_precio(self, _input):
         self.input = _input
         self.Precio_venta = self.input
@@ -213,7 +214,7 @@ class reg_prod_view():
                 self.valid_values = False
                 return True
 
-
+    # Validacion de proveedor
     def validar_proveedor(self, _input):
         self.input = _input
 
@@ -231,7 +232,7 @@ class reg_prod_view():
                 self.valid_values = False
                 return True
 
-
+    # Validacion de costo
     def validar_costo(self, _input):
         self.input = _input
         self.sale_price = int(self.Precio_venta)
@@ -259,6 +260,7 @@ class reg_prod_view():
                 self.valid_values = False
                 return True
 
+    # Validacion de itbis
     def validar_itbis(self, _input):
         self.input = _input
         self.itbis_num = 18

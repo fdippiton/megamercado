@@ -14,6 +14,7 @@ from Ventas.rpt_ventas import rpt_ventas
 from Registrar.register_main import register_view # Template principal registrar usuarios
 from Clientes.cli import listar_clientes
 from Almacen.alm import reg_alm_view
+from Proveedores.prov import listar_proveedores
 
 """ Definir los frames con la estructura siguiente:
 
@@ -92,19 +93,19 @@ class Application:
 # ----------------------------- PAGINA PRINCIPAL ---------------------------------------
     # Page Main Frames
             # Contenedor de la pagina principal
-        self.main_page_container = tk.Frame(self.main_win, width=1200, height=600, bg='#37648B')
+        self.main_page_container = tk.Frame(self.main_win, width=1200, height=600, bg='#263859')
         self.main_page_container.grid()
 
             # Contenedor del logo 'MEGAMERCADO' de la barra superior
-        self.top_bar_logo = tk.Frame(self.main_page_container, width=200, height=30, bg='#37648B')
+        self.top_bar_logo = tk.Frame(self.main_page_container, width=200, height=30, bg='#263859')
         self.top_bar_logo.grid(row=0, column=0, pady=24)
             
             # Contendor de la barra superior 
-        self.top_bar_user = tk.Frame(self.main_page_container, width=1000, height=30, bg='#37648B')
+        self.top_bar_user = tk.Frame(self.main_page_container, width=1000, height=30, bg='#263859')
         self.top_bar_user.grid(row=0, column=1, sticky='e', padx=20)
 
             # Contenedor del Menu 
-        self.menu_frame = tk.Frame(self.main_page_container, width=200, height=570, bg='#37648B')
+        self.menu_frame = tk.Frame(self.main_page_container, width=200, height=570, bg='#263859')
         self.menu_frame.grid(row=1, column=0, sticky='n', pady=30)
 
             # Contenedor del contenido principal - Main content
@@ -187,9 +188,9 @@ class Application:
     
     # Muestran los botones de clientes, Proveedores y almacen
     def button(self):
-        self.Btn1 = tk.Button(self.frame1, text="Clientes", bg="#a1bad0", font=('Roboto Mono Semibold', 12), command=self.show_all_cli, width=18, height=2, borderwidth=3).place(relx=0.20,rely=0.20)
-        self.Btn2 = tk.Button(self.frame1, text="Proveedores", bg="#a1bad0", font=('Roboto Mono Semibold', 12), width=18, height=2, borderwidth=3).place(relx=0.50,rely=0.20)
-        self.Btn3 = tk.Button(self.frame1, text="Almacén", bg="#a1bad0", font=('Roboto Mono Semibold', 12), width=18, height=2, borderwidth=3).place(relx=0.35,rely=0.45)
+        self.Btn1 = tk.Button(self.frame1, text="Clientes", bg="#EAEAEA", font=('Roboto Mono Semibold', 12), command=self.show_all_cli, width=18, height=2, borderwidth=1).place(relx=0.20,rely=0.20)
+        self.Btn2 = tk.Button(self.frame1, text="Proveedores", bg="#EAEAEA", font=('Roboto Mono Semibold', 12), command=self.show_all_providers, width=18, height=2, borderwidth=1).place(relx=0.50,rely=0.20)
+        self.Btn3 = tk.Button(self.frame1, text="Almacén", bg="#EAEAEA", font=('Roboto Mono Semibold', 12), width=18, height=2, borderwidth=1).place(relx=0.35,rely=0.45)
         
 
     # Mostrar registrar producto
@@ -245,6 +246,14 @@ class Application:
         self._cli = listar_clientes(self.main_content)
         self._cli.list_cli_title()
         self._cli.show_list_cli()
+
+    # Mostrar todos los proveedores
+    def show_all_providers(self):
+        self.remove_frames()
+        self.main_content.grid()
+        self._prov = listar_proveedores(self.main_content)
+        self._prov.list_prov_title()
+        self._prov.show_list_prov()
 
     # Limpiar el main-content frame principal
     def remove_frames(self):

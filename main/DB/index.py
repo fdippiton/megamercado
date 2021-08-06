@@ -15,6 +15,8 @@ class _db():
         self.conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL server};''SERVER='+self.server+';' 'DATABASE='+self.db+';' 'Trusted_Connection=yes;')
         self._cursor = self.conn.cursor()
         
+
+        # Para validacion de codigo de producto
         self.validate = 0
 
     # Registrar productos
@@ -67,7 +69,7 @@ class _db():
     # Listar todos los productos en reporte por almacen
     def retrieve_prod_alm(self, _table):
         try:
-            self.sql_prod = 'SELECT Prod_Nombre, Prod_CostoUnidad, Alm_Producto, Alm_ValorInvertario, Alm_UnidadesDisponibles FROM dbo.Productos FULL OUTER JOIN dbo.Almacenes ON (Prod_Codigo = Alm_Producto)'
+            self.sql_prod = 'SELECT Prod_Nombre, Prod_CostoUnidad, Alm_Producto, Alm_ValorInventario, Alm_UnidadesDisponibles FROM dbo.Productos FULL OUTER JOIN dbo.Almacenes ON (Prod_Codigo = Alm_Producto)'
             self._tree = _table
 
             for row in self._cursor.execute(self.sql_prod):
@@ -75,6 +77,23 @@ class _db():
             
             self._cursor.close()
             self.conn.close()
+        except:
+                raise
+
+    # Generar reporte de los productos x almacen
+    def retrieve_rpt_prod_alm(self):
+        try:
+            #self.sql = '''SELECT * FROM dbo.Almacenes'''
+            self.sql = 'SELECT Prod_Nombre, Prod_CostoUnidad, Alm_Producto, Alm_ValorInventario, Alm_UnidadesDisponibles FROM dbo.Productos FULL OUTER JOIN dbo.Almacenes ON (Prod_Codigo = Alm_Producto)'
+            self.prods = []
+
+            for row in self._cursor.execute(self.sql):
+                self.prods.append(row)
+                
+            self._cursor.close()
+            self.conn.close()
+
+            return self.prods
         except:
                 raise 
     
@@ -135,7 +154,7 @@ class _db():
     # Recuperar todos los productos activos
     def retrieve_all_prod(self, _frame, _table):
         try:
-            self.sql = '''SELECT Prod_codigo, Prod_Nombre  FROM dbo.Productos WHERE Prod_Estatus='A' '''
+            self.sql = '''SELECT Prod_Codigo, Prod_Nombre  FROM dbo.Productos WHERE Prod_Estatus='A' '''
             self._tree = _table
             self._frame = _frame
 
@@ -150,7 +169,55 @@ class _db():
     # Calcular y obtener el numero total de productos
     def retrieve_total_prod(self):
         try:
-            self.sql = '''SELECT Prod_codigo FROM dbo.Productos WHERE Prod_Estatus='A' '''
+            self.sql = '''SELECT Prod_Codigo FROM dbo.Productos WHERE Prod_Estatus='A' '''
+            self.total = 0
+
+            for row in self._cursor.execute(self.sql):
+                self.total += 1
+                
+            self._cursor.close()
+            self.conn.close()
+
+            return self.total
+        except:
+                raise 
+    
+    # Generar reporte de productos productos 
+    def retrieve_rpt_prod(self):
+        try:
+            self.sql = '''SELECT * FROM dbo.Productos'''
+            self.prods = []
+
+            for row in self._cursor.execute(self.sql):
+                self.prods.append(row)
+                
+            self._cursor.close()
+            self.conn.close()
+
+            return self.prods
+        except:
+                raise 
+
+    # Generar reporte de proveedores
+    def retrieve_rpt_prov(self):
+        try:
+            self.sql = '''SELECT * FROM dbo.Proveedores'''
+            self.prov = []
+
+            for row in self._cursor.execute(self.sql):
+                self.prov.append(row)
+                
+            self._cursor.close()
+            self.conn.close()
+
+            return self.prov
+        except:
+                raise 
+    
+    # Mostrar el total de proveedores
+    def retrieve_total_prov(self):
+        try:
+            self.sql = '''SELECT Prov_Codigo FROM dbo.Proveedores WHERE Prov_Estatus='A' '''
             self.total = 0
 
             for row in self._cursor.execute(self.sql):
@@ -166,7 +233,7 @@ class _db():
     # Calcular y obtener el valor total de todos los productos del inventario
     def retrieve_total_val_inv(self):
         try:
-            self.sql = 'SELECT Alm_ValorInvertario FROM dbo.Almacenes WHERE Alm_ValorInvertario >= 0'
+            self.sql = 'SELECT Alm_ValorInventario FROM dbo.Almacenes WHERE Alm_ValorInventario >= 0'
             self.total = 0
 
             for row in self._cursor.execute(self.sql):
@@ -176,7 +243,6 @@ class _db():
             self.conn.close()
 
             return self.total
-            #print(self.total)
         except:
                 raise 
 
@@ -210,7 +276,54 @@ class _db():
         except:
                 raise 
     
-  
+    # Generar reporte de clientes
+    def retrieve_rpt_cli(self):
+        try:
+            self.sql = '''SELECT Cli_Codigo, Cli_Direccion, Cli_Nombres, Cli_Apellidos, Cli_RNC_Cedula, Cli_Telefono  FROM dbo.Clientes'''
+            self.cli = []
+
+            for row in self._cursor.execute(self.sql):
+                self.cli.append(row)
+                
+            self._cursor.close()
+            self.conn.close()
+
+            return self.cli
+        except:
+                raise 
+    
+    # Obtener el total de clientes
+    def retrieve_total_cli(self):
+        try:
+            self.sql = '''SELECT Cli_Codigo FROM dbo.Clientes WHERE Cli_Estatus='A' '''
+            self.total = 0
+
+            for row in self._cursor.execute(self.sql):
+                self.total += 1
+                
+            self._cursor.close()
+            self.conn.close()
+
+            return self.total
+        except:
+                raise 
+
+    # Obtener los proveedores
+    def retrieve_providers(self, _table):
+        try:
+            self.sql = '''SELECT Prov_Codigo, Prov_Direccion, Prov_Nombre,  Prov_Servicios, Prov_Telefono, Prov_RNC_Cedula, Prov_SitioWeb FROM dbo.Proveedores'''
+            self._tree = _table
+
+            for row in self._cursor.execute(self.sql):
+                self._tree.insert('', 0, values= (row[0], row[2], row[1], row[6], row[4], row[3], row[5]))
+                
+            self._cursor.close()
+            self.conn.close()
+        except:
+                raise 
+    
+    
+    # Validar el codigo de producto para evitar repeticion
     def validate_code(self, _input, _frame):
         self.input = _input
         self._frame = _frame
@@ -227,10 +340,8 @@ class _db():
                 self.str_code_array.append(self._val)
 
             self.values = self.input in self.str_code_array
-            #print(self.values)
 
             if self.values:
-                #print("Esta registrado")
                 tk.Label(self._frame, text='Se encuentra registrado', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=1, column=2, sticky='w', ipady=5)
             else:
                 tk.Label(self._frame, text='Correcto', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=1, column=2, sticky='w', ipady=5)
