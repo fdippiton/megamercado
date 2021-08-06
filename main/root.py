@@ -13,7 +13,7 @@ from Productos.all_prod import _products             # Productos
 from Ventas.rpt_ventas import rpt_ventas
 from Registrar.register_main import register_view # Template principal registrar usuarios
 from Clientes.cli import listar_clientes
-
+from Almacen.alm import reg_alm_view
 
 """ Definir los frames con la estructura siguiente:
 
@@ -111,7 +111,6 @@ class Application:
         self.main_content = tk.Frame(self.main_page_container, width=1000, height=570, bg='white')
         self.main_content.grid(row=1, column=1)
 
-
     # Implementacion del template - Barra superior
         self.header = main_bar(self.top_bar_logo, self.top_bar_user)
         self.header.main_bar_view()
@@ -119,11 +118,11 @@ class Application:
 
 # -------------------------------- MENU ---------------------------------------------------
         # MENU BAR
-        self.btn_inicio = tk.Button(self.menu_frame, text='Inicio', command=self.main_view, font=('Roboto Mono', 10), borderwidth=2)
+        self.btn_inicio = tk.Button(self.menu_frame, text='Inicio', command=self.main_view, font=('Roboto Mono Semibold', 10), borderwidth=2)
         self.btn_inicio.grid(padx=40, pady=10, ipadx=47, ipady=5)
         
         # Productos menu
-        self.menu_prod = tk.Menubutton(self.menu_frame, text='Productos', relief=RAISED, font=('Roboto Mono', 10), borderwidth=2)
+        self.menu_prod = tk.Menubutton(self.menu_frame, text='Productos', relief=RAISED, font=('Roboto Mono Semibold', 10), borderwidth=2)
         self.menu_prod.grid( pady=10, ipadx=35, ipady=5)
 
         self.menu_prod.menu = tk.Menu(self.menu_prod, tearoff=0)
@@ -138,7 +137,7 @@ class Application:
         self.menu_prod.menu.add_checkbutton(label='Listar productos x almacén', variable=self.lis_prod, font=('Roboto Mono', 9), command=self.show_list_prod_alm)
 
         # Pedidos
-        self.menu_ped = tk.Menubutton(self.menu_frame, text='Pedidos', relief=RAISED, font=('Roboto Mono', 10), borderwidth=2)
+        self.menu_ped = tk.Menubutton(self.menu_frame, text='Pedidos', relief=RAISED, font=('Roboto Mono Semibold', 10), borderwidth=2)
         self.menu_ped.grid( pady=10, ipadx=45, ipady=5)
 
         self.menu_ped.menu = tk.Menu(self.menu_ped, tearoff=0)
@@ -150,7 +149,7 @@ class Application:
         self.menu_ped.menu.add_checkbutton(label='Listar pedidos', variable=self.lis_ped,  font=('Roboto Mono', 9))
         
         # Ventas
-        self.menu_ven = tk.Menubutton(self.menu_frame, text='Ventas', relief=RAISED,  font=('Roboto Mono', 10), borderwidth=2)
+        self.menu_ven = tk.Menubutton(self.menu_frame, text='Ventas', relief=RAISED,  font=('Roboto Mono Semibold', 10), borderwidth=2)
         self.menu_ven.grid( pady=10, ipadx=50, ipady=5)
 
         self.menu_ven.menu = tk.Menu(self.menu_ven, tearoff=0)
@@ -160,7 +159,7 @@ class Application:
         self.menu_ven.menu.add_checkbutton(label='Reporte de ventas', variable=self.rpt_ven,  font=('Roboto Mono', 9), command=self.show_rpt_ventas)
 
         # Facturacion
-        self.menu_fac = tk.Menubutton(self.menu_frame, text='Facturacion', relief=RAISED, font=('Roboto Mono', 10), borderwidth=2)
+        self.menu_fac = tk.Menubutton(self.menu_frame, text='Facturacion', relief=RAISED, font=('Roboto Mono Semibold', 10), borderwidth=2)
         self.menu_fac.grid( pady=10, ipadx=27, ipady=5)
 
         self.menu_fac.menu = tk.Menu(self.menu_fac, tearoff=0)
@@ -183,14 +182,14 @@ class Application:
     def ImageLogo(self):
         self.frame1 = tk.Frame(self.main_content, bg='white', width=550)
         self.frame1.place(relx=0, rely=0, relwidth=1, relheight=1)
-        self.label1 = tk.Label(self.frame1,text="MEGAMERCADO", font=('Roboto Mono', 40), bg='white').place(relx=0.50, rely=0.70)		
-        self.label2 = tk.Label(self.frame1,text="Calidad y Confianza", font=('Roboto Mono', 20), bg='white').place(relx=0.53, rely=0.83)
+        self.label1 = tk.Label(self.frame1,text="MEGAMERCADO", font=('Roboto Mono', 35), bg='white').place(relx=0.40, rely=0.65)
+        self.label2 = tk.Label(self.frame1,text="Calidad y Confianza", font=('Roboto Mono', 20), bg='white').place(relx=0.53, rely=0.76)
     
     # Muestran los botones de clientes, Proveedores y almacen
     def button(self):
-        self.Btn1 = tk.Button(self.frame1,text="Clientes",bg="#ADC6DB",font=('Roboto Mono Bold', 15), command=self.show_all_cli, relief="sunken",width=18,height=3,borderwidth=3).place(relx=0.20,rely=0.20)
-        self.Btn2 = tk.Button(self.frame1,text="Proveedores",bg="#ADC6DB",font=('Roboto Mono Bold', 15),relief="sunken",width=18,height=3,borderwidth=3).place(relx=0.50,rely=0.20)
-        self.Btn3 = tk.Button(self.frame1,text="Almacén",bg="#ADC6DB",font=('Roboto Mono Bold', 15),relief="sunken",width=18,height=3,borderwidth=3).place(relx=0.35,rely=0.45)
+        self.Btn1 = tk.Button(self.frame1, text="Clientes", bg="#a1bad0", font=('Roboto Mono Semibold', 12), command=self.show_all_cli, width=18, height=2, borderwidth=3).place(relx=0.20,rely=0.20)
+        self.Btn2 = tk.Button(self.frame1, text="Proveedores", bg="#a1bad0", font=('Roboto Mono Semibold', 12), width=18, height=2, borderwidth=3).place(relx=0.50,rely=0.20)
+        self.Btn3 = tk.Button(self.frame1, text="Almacén", bg="#a1bad0", font=('Roboto Mono Semibold', 12), width=18, height=2, borderwidth=3).place(relx=0.35,rely=0.45)
         
 
     # Mostrar registrar producto

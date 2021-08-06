@@ -9,7 +9,6 @@ import pyodbc
 from DB.index import _db
 
 
-
 class _products():
     def __init__(self, _frame):
         self._frame = _frame

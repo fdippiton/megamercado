@@ -15,6 +15,8 @@ class _db():
         self.conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL server};''SERVER='+self.server+';' 'DATABASE='+self.db+';' 'Trusted_Connection=yes;')
         self._cursor = self.conn.cursor()
         
+        self.validate = 0
+
     # Registrar productos
     def conn_submit(self, sql_prod, sql_alm, code,  name, price, provider, cost, itbis, estatus):
         try:
@@ -27,7 +29,7 @@ class _db():
             self.conn.close()
             messagebox.showinfo(title='Registro de producto', message='Producto registrado exitosamente')
         except:
-            messagebox.showinfo(title='Registro de producto', message='Ha ocurrido un error al registrar producto')
+            messagebox.showerror(title='Registro de producto', message='Ha ocurrido un error al registrar producto')
             raise
 
     # Listar todos los productos en reporte
@@ -209,5 +211,37 @@ class _db():
                 raise 
     
   
-   
+    def validate_code(self, _input, _frame):
+        self.input = _input
+        self._frame = _frame
+        try:
+            self.sql_ret = 'SELECT Prod_Codigo FROM dbo.Productos'
+            self.code_array = []
+            self.str_code_array = []
+
+            for item in self._cursor.execute(self.sql_ret):
+                self.code_array.append(item[0])
+        
+            for row in self.code_array:
+                self._val = str(row)
+                self.str_code_array.append(self._val)
+
+            self.values = self.input in self.str_code_array
+            #print(self.values)
+
+            if self.values:
+                #print("Esta registrado")
+                tk.Label(self._frame, text='Se encuentra registrado', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=1, column=2, sticky='w', ipady=5)
+            else:
+                tk.Label(self._frame, text='Correcto', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=1, column=2, sticky='w', ipady=5)
+                self.validate = 1
+            self._cursor.close()
+            self.conn.close()
+        except:
+                raise 
+    
+    def no_duplicate(self):
+        return self.validate
+
+
 
