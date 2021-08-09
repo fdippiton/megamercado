@@ -3,6 +3,8 @@ from tkinter.ttk import Treeview
 import pyodbc
 import tkinter as tk
 from tkinter import messagebox
+
+from reportlab.lib.utils import prev_this_next
 #import Productos.gen_prod
 
 
@@ -292,6 +294,54 @@ class _db():
         except:
                 raise 
     
+        # Generar reporte de ventas
+    def retrieve_rpt_sales(self, _table, _frame):
+        self._frame = _frame
+        self._table = _table
+        try:
+            #self.rpt = []
+            self.sales = []
+            self._prods = 'SELECT Prod_Codigo FROM dbo.Productos'
+
+            self.total_sales = 0
+
+            for row in self._cursor.execute(self._prods):
+                self.sales.append(int(row[0]))
+
+            for code in self.sales:
+                self.sql = 'SELECT Det_Producto, Det_Cantidad, Prod_Codigo, Prod_Nombre, Prod_PrecioVenta  FROM DetalleFacturas INNER JOIN Productos ON (Det_Producto = Prod_Codigo) WHERE (Det_Producto = {} and Det_Cantidad > 0)'.format(code)
+                self.sale_price = 0
+                self.sale_amount = 0
+                self.final_sales = 0
+                
+
+                self.pro_c = ''
+                self.pro_name = ''
+                
+                for row in self._cursor.execute(self.sql):
+                    if row[1] == 0:
+                        print('es cero')
+                    else:
+                        self.sale_amount = self.sale_amount + row[1]
+                        self.sale_price = row[4]
+                        self.final_sales = self.sale_price * self.sale_amount
+                        self.pro_c = row[0]
+                        self.pro_name = row[3]
+                
+                if self.sale_amount == 0:
+                    print('Esta vacio')
+                else:
+                    self.total_sales = self.total_sales + self.final_sales
+                    self._table.insert('', 0, values=(self.pro_c, self.pro_name, self.sale_amount,self.sale_price, self.final_sales))
+
+                self.num_total_prod_title = tk.Label(self._frame, text='Total en ventas: '+str(self.total_sales)+'', bg='white', font=('Roboto Mono Bold', 8)).grid(row=4, column=0)
+                
+            self._cursor.close()
+            self.conn.close()
+        except:
+                raise 
+    
+    
     # Obtener el total de clientes
     def retrieve_total_cli(self):
         try:
@@ -311,14 +361,34 @@ class _db():
     # Obtener los proveedores
     def retrieve_providers(self, _table):
         try:
-            self.sql = '''SELECT Prov_Codigo, Prov_Direccion, Prov_Nombre,  Prov_Servicios, Prov_Telefono, Prov_RNC_Cedula, Prov_SitioWeb FROM dbo.Proveedores'''
+            self.sql = '''SELECT Prov_Codigo, Prov_Direccion, Prov_Nombre,  Prov_Tipo, Prov_Telefono, Prov_RNC FROM dbo.Proveedores'''
             self._tree = _table
 
             for row in self._cursor.execute(self.sql):
-                self._tree.insert('', 0, values= (row[0], row[2], row[1], row[6], row[4], row[3], row[5]))
+                self._tree.insert('', 0, values= (row[0], row[2], row[1], row[5], row[4], row[3]))
                 
             self._cursor.close()
             self.conn.close()
+        except:
+                raise 
+    
+    def retrieve_providers_menu(self):
+        try:
+            self.sql = '''SELECT Prov_nombre  FROM dbo.Proveedores'''
+            self.prov = []
+
+            self._array_ = self._cursor.execute(self.sql)
+
+            for row in self._array_:
+                self.prov.append(str(row[0]))
+
+            #for row in self._cursor.execute(self.sql):
+                #self.prov.append(row)
+                
+            self._cursor.close()
+            self.conn.close()
+
+            return self.prov
         except:
                 raise 
     

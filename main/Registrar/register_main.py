@@ -1,7 +1,9 @@
 
 import tkinter as tk
 from tkinter import ttk
+from tkinter.constants import COMMAND
 from tkinter.font import families
+import os
 
 
 # PAGE 1 - Registrarse
@@ -19,7 +21,7 @@ class register_view():
         self.register_title.grid(row=0, column=1, sticky='we', pady=(1, 5))
 
         # Administrator
-        self.adm = tk.Button(self._frameRight, text='Administrador', font=('Roboto Mono', 12), bg='white', width=15)
+        self.adm = tk.Button(self._frameRight, text='Administrador', font=('Roboto Mono', 12), bg='white', width=15, command=self.show_main_page)
         self.adm.grid(row=1, column=1, pady=(1, 20))
 
         # Client
@@ -37,3 +39,7 @@ class register_view():
         # Login
         self.login = tk.Button(self._frameRight, text='Iniciar sesion', font=('Roboto Mono', 9), bg='white', fg='#4731D4')
         self.login.grid(row=5, column=1, pady=(2, 20))
+
+    # def show_main_page(self):
+        #path = r'C:\Users\MSI\Desktop\Megamercado\Megamercado\main\root.py'
+        #os.sye(r'C:\Users\MSI\Desktop\Megamercado\Megamercado\main\root.py')

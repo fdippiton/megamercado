@@ -92,17 +92,17 @@ class listar_clientes():
             self.count = 630
             for prods in self._cli:
                 rpt.drawString(50, self.count, str(prods[0]))
-                rpt.drawString(125, self.count, str(prods[5]))
-                rpt.drawString(200, self.count, str(prods[1]))
-                rpt.drawString(275, self.count, str(prods[2]))
-                rpt.drawString(350, self.count, str(prods[3]))
-                rpt.drawString(425, self.count, str(prods[4]))
+                rpt.drawString(125, self.count, str(prods[2]))
+                rpt.drawString(200, self.count, str(prods[3]))
+                rpt.drawString(275, self.count, str(prods[4]))
+                rpt.drawString(350, self.count, str(prods[5]))
+                rpt.drawString(425, self.count, str(prods[1]))
                 self.count = self.count - 10
 
             
             self.num_cli = str(self.total_cli())
             self._ct = self.count - 20
-            rpt.drawString(50, self._ct, 'Número total de clientes:')
+            rpt.drawString(50, self._ct, 'Número total de clientes:  ')
             rpt.drawString(130, self._ct, self.num_cli)
             
             rpt.save()

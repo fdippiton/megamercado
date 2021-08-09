@@ -34,7 +34,7 @@ class reg_prod_view():
         self.reg_cod = self._frame.register(self.validar_codigo) 
         self.reg_nom = self._frame.register(self.validar_nombre)
         self.reg_price = self._frame.register(self.validar_precio)
-        self.reg_prov = self._frame.register(self.validar_proveedor)
+        #self.reg_prov = self._frame.register(self.validar_proveedor)
         self.reg_cost = self._frame.register(self.validar_costo)
         self.reg_itbis = self._frame.register(self.validar_itbis)
 
@@ -64,9 +64,15 @@ class reg_prod_view():
         # Creating Supplier
         self.supplier = tk.Label(self._frame, text='Proveedor: ', font=('Roboto Mono', 11), bg='white', width=20, anchor='e')
         self.supplier.grid(row=4, column=0, sticky='e', pady=7)
-        self.Prod_supplier = tk.Entry(self._frame, textvariable=self.Prod_Proveedor, width=45, bg='#f2f4f6', validate='all', validatecommand=(self.reg_prov, '%P')).grid(row=4, column=1, sticky='w', padx=5, pady=7, ipady=4)
+        #self.Prod_supplier = tk.Entry(self._frame, textvariable=self.Prod_Proveedor, width=45, bg='#f2f4f6', validate='all', validatecommand=(self.reg_prov, '%P')).grid(row=4, column=1, sticky='w', padx=5, pady=7, ipady=4)
 
+        self.db_prov  = _db()
+        _providers = self.db_prov.retrieve_providers_menu()
+ 
+        self.Prod_Proveedor.set(_providers[0])
+        self.supplier = tk.OptionMenu(self._frame, self.Prod_Proveedor, *_providers).grid(row=4, column=1, sticky='w', padx=5, pady=7, ipady=4)
         
+
         # Creating cost
         self.cost = tk.Label(self._frame, text='Costo de unidad: ', font=('Roboto Mono', 11), bg='white', width=20, anchor='e')
         self.cost.grid(row=5, column=0, sticky='e', pady=7)
@@ -111,7 +117,7 @@ class reg_prod_view():
         self.Prod_Codigo.set('')
         self.Prod_Nombre.set('')
         self.Prod_PrecioVenta.set('')
-        self.Prod_Proveedor.set('')
+        self.Prod_Proveedor.set('Ninguno')
         self.Prod_CostoUnidad.set('')
         self.Prod_ITBIS.set('')
 
@@ -214,6 +220,7 @@ class reg_prod_view():
                 self.valid_values = False
                 return True
 
+    """
     # Validacion de proveedor
     def validar_proveedor(self, _input):
         self.input = _input
@@ -231,11 +238,19 @@ class reg_prod_view():
                 tk.Label(self._frame, text='Invalido. Contiene números', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=4, column=2, sticky='w', ipady=5)
                 self.valid_values = False
                 return True
+    """
 
     # Validacion de costo
     def validar_costo(self, _input):
         self.input = _input
-        self.sale_price = int(self.Precio_venta)
+        self.sale_price = 0
+
+        if self.Precio_venta == '':
+            self.Precio_venta = 0
+            self.sale_price = int(self.Precio_venta)
+        else:
+            self.sale_price = int(self.Precio_venta)
+            #print(type(self.sale_price))
 
         self.Costo_uni = self.input
         

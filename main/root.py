@@ -15,6 +15,11 @@ from Registrar.register_main import register_view # Template principal registrar
 from Clientes.cli import listar_clientes
 from Almacen.alm import reg_alm_view
 from Proveedores.prov import listar_proveedores
+from Facturacion.gen_fact import gen_factura
+
+from tkinter import filedialog
+import os
+import subprocess
 
 """ Definir los frames con la estructura siguiente:
 
@@ -43,57 +48,14 @@ from Proveedores.prov import listar_proveedores
         self._reg.reg_prod()
 
 """
-class Application:
-    def __init__(self, master):
-        self.main_win = master 
-        self.main_win.title('Megamercado')
-        self.main_win.geometry('1200x600')
-        self.main_win.rowconfigure(0, weight=1)
-        self.main_win.columnconfigure(0, weight=1)
-        self.main_win.configure(bg='white')
-        
-
-        # CREACION DE FRAMES
-        
-#   -------------------------- PAGE 1 ----------------------------------------------
-        # Registro de Administrador-cliente-proveedor frames
-        # Frame container
-        self.container = tk.Frame(self.main_win, width=1200, height=600, bg='yellow')
-        self.container.grid(row=0, column=0)
-        
-        #Frame de la imagen del logo
-        self.logo_image = tk.Frame(self.container, width=600, height=600, bg='white')
-        self.logo_image.grid(row=0, column=0)
-        
-        # Frame registrar
-        self.register = tk.Frame(self.container, width=600, height=600, bg='white')
-        self.register.grid(row=0, column=1)
-
-        # FUNCION QUE EJECUTA LA PAGINA 1
-        #self.main_register = register_view(self.logo_image, self.register)
-        #self.main_register.register_users()
-
-# ----------------------------- PAGE 2 --------------------------------------
-
-        # Frames - Registrar adm
-
-# ----------------------------- PAGE 3 ---------------------------------------
-        # Frames - Registrar cliente
-
-
-# ----------------------------- PAGE 4 ---------------------------------------
-        # Page 4 Frames - Registrar proveedor
-
-
-# ----------------------------- PAGE 5 ---------------------------------------
-        # Page 5 Frames - Iniciar sesion adm
-
-
-
+class App_main:
+    def __init__(self, _frame):
+        self._frame = _frame
 # ----------------------------- PAGINA PRINCIPAL ---------------------------------------
     # Page Main Frames
+    def main_(self):
             # Contenedor de la pagina principal
-        self.main_page_container = tk.Frame(self.main_win, width=1200, height=600, bg='#263859')
+        self.main_page_container = tk.Frame(self._frame, width=1200, height=600, bg='#263859')
         self.main_page_container.grid()
 
             # Contenedor del logo 'MEGAMERCADO' de la barra superior
@@ -168,7 +130,7 @@ class Application:
 
         self.gen_fact = tk.IntVar()
         self.lis_fact = tk.IntVar()
-        self.menu_fac.menu.add_checkbutton(label='Generar factura', variable=self.gen_fact,  font=('Roboto Mono', 9))
+        self.menu_fac.menu.add_checkbutton(label='Generar factura', variable=self.gen_fact,  font=('Roboto Mono', 9), command=self.show_gen_fact)
         self.menu_fac.menu.add_checkbutton(label='Listar factura', variable=self.lis_fact,  font=('Roboto Mono', 9))
        
         
@@ -186,12 +148,20 @@ class Application:
         self.label1 = tk.Label(self.frame1,text="MEGAMERCADO", font=('Roboto Mono', 35), bg='white').place(relx=0.40, rely=0.65)
         self.label2 = tk.Label(self.frame1,text="Calidad y Confianza", font=('Roboto Mono', 20), bg='white').place(relx=0.53, rely=0.76)
     
+
     # Muestran los botones de clientes, Proveedores y almacen
     def button(self):
-        self.Btn1 = tk.Button(self.frame1, text="Clientes", bg="#EAEAEA", font=('Roboto Mono Semibold', 12), command=self.show_all_cli, width=18, height=2, borderwidth=1).place(relx=0.20,rely=0.20)
-        self.Btn2 = tk.Button(self.frame1, text="Proveedores", bg="#EAEAEA", font=('Roboto Mono Semibold', 12), command=self.show_all_providers, width=18, height=2, borderwidth=1).place(relx=0.50,rely=0.20)
-        self.Btn3 = tk.Button(self.frame1, text="Almacén", bg="#EAEAEA", font=('Roboto Mono Semibold', 12), width=18, height=2, borderwidth=1).place(relx=0.35,rely=0.45)
+        self.Btn1 = tk.Button(self.frame1, text="Clientes", bg="white", font=('Roboto Mono Semibold', 12), command=self.show_all_cli, width=18, height=2, borderwidth=3).place(relx=0.30,rely=0.20)
+        self.Btn2 = tk.Button(self.frame1, text="Proveedores", bg="white", font=('Roboto Mono Semibold', 12), command=self.show_all_providers, width=18, height=2, borderwidth=3).place(relx=0.53,rely=0.20)
+        self.Btn3 = tk.Button(self.frame1, text="Almacén", bg="white", font=('Roboto Mono Semibold', 12), width=22, height=2, borderwidth=3).place(relx=0.15,rely=0.45)
         
+         # Client
+        self.client = tk.Button(self.frame1, text=' Registrar cliente', bg="white", font=('Roboto Mono Semibold', 12), width=22, height=2, borderwidth=3, command=self.start_cli)
+        self.client.place(relx=0.40,rely=0.45)
+
+        # Supplier
+        self.prov = tk.Button(self.frame1, text='Registrar proveedor', bg="white", font=('Roboto Mono Semibold', 12), width=22, height=2, borderwidth=3, command=self.start_prov)
+        self.prov.place(relx=0.65,rely=0.45)
 
     # Mostrar registrar producto
     def show_reg_prod(self):
@@ -255,17 +225,28 @@ class Application:
         self._prov.list_prov_title()
         self._prov.show_list_prov()
 
+    def show_gen_fact(self):
+        self.remove_frames()
+        self.main_content.grid()
+        self._fact = gen_factura(self.main_content)
+        self._fact.gen_prod()
+
+    
+    def start_cli(self):
+        os.system('clientes.exe')
+    
+    def start_prov(self):
+        os.system('Proveedores.exe')
+
+
+
+
     # Limpiar el main-content frame principal
     def remove_frames(self):
         for widget in self.main_content.winfo_children(): # Toma todos los widgets de ese frame
             widget.destroy()                             # Destruye los widgets
 
-        
-if __name__ == '__main__':
-    master = tk.Tk()
-    _App = Application(master)
-    master.mainloop()
-    
+
 
 
 

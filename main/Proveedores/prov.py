@@ -30,22 +30,20 @@ class listar_proveedores():
 
 
     def show_list_prov(self):
-        self.tree_Table = ttk.Treeview(self._frame, height=13, columns=('#1', '#2', '#3', '#4', '#5', '#6', '#7'), show='headings')
+        self.tree_Table = ttk.Treeview(self._frame, height=13, columns=('#1', '#2', '#3', '#4', '#5', '#6'), show='headings')
         self.tree_Table.grid(row=3, column=0)
         self.tree_Table.heading('#1', text='Codigo', anchor='center')
-        self.tree_Table.column('#1', minwidth=0, width=135, stretch='NO')
+        self.tree_Table.column('#1', minwidth=0, width=157, stretch='NO')
         self.tree_Table.heading('#2', text='Nombre', anchor='center')
-        self.tree_Table.column('#2', minwidth=0, width=135, stretch='NO')
+        self.tree_Table.column('#2', minwidth=0, width=157, stretch='NO')
         self.tree_Table.heading('#3', text='Direccion', anchor='center')
-        self.tree_Table.column('#3', minwidth=0, width=135, stretch='NO')
+        self.tree_Table.column('#3', minwidth=0, width=157, stretch='NO')
         self.tree_Table.heading('#4', text='RNC/Cedula', anchor='center')
-        self.tree_Table.column('#4', minwidth=0, width=135, stretch='NO')
+        self.tree_Table.column('#4', minwidth=0, width=157, stretch='NO')
         self.tree_Table.heading('#5', text='Telefono', anchor='center')
-        self.tree_Table.column('#5', minwidth=0, width=135, stretch='NO')
-        self.tree_Table.heading('#6', text='Sitio web', anchor='center')
-        self.tree_Table.column('#6', minwidth=0, width=135, stretch='NO')
-        self.tree_Table.heading('#7', text='Servicios', anchor='center')
-        self.tree_Table.column('#7', minwidth=0, width=135, stretch='NO')
+        self.tree_Table.column('#5', minwidth=0, width=157, stretch='NO')
+        self.tree_Table.heading('#6', text='Tipo', anchor='center')
+        self.tree_Table.column('#6', minwidth=0, width=157, stretch='NO')
 
         self.scroll_tree = tk.Scrollbar(self._frame, orient='vertical', command=self.tree_Table.yview, width=20)
         self.scroll_tree.grid(row=3, column=1, sticky='nsew')
@@ -89,8 +87,7 @@ class listar_proveedores():
             rpt.drawString(160, 650, 'Direccion')
             rpt.drawString(250, 650, 'RNC/Cedula')
             rpt.drawString(330, 650, 'Telefono')
-            rpt.drawString(410, 650, 'Sitio web')
-            rpt.drawString(470, 650, 'Servicios')
+            rpt.drawString(410, 650, 'Tipo')
             rpt.line(30, 645, 500, 645)
 
             self.count = 630
@@ -98,10 +95,9 @@ class listar_proveedores():
                 rpt.drawString(20, self.count, str(prods[0]))
                 rpt.drawString(80, self.count, str(prods[2]))
                 rpt.drawString(170, self.count, str(prods[1]))
-                rpt.drawString(250, self.count, str(prods[6]))
+                rpt.drawString(250, self.count, str(prods[5]))
                 rpt.drawString(320, self.count, str(prods[4]))
                 rpt.drawString(420, self.count, str(prods[3]))
-                rpt.drawString(470, self.count, str(prods[5]))
                 self.count = self.count - 10
 
             
