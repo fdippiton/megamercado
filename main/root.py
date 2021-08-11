@@ -1,4 +1,5 @@
 #from tkinter import ttk
+
 import tkinter as tk
 from tkinter import Label, Menu, Menubutton, ttk
 from tkinter.constants import ANCHOR, COMMAND, RAISED, S
@@ -16,6 +17,7 @@ from Clientes.cli import listar_clientes
 from Almacen.alm import reg_alm_view
 from Proveedores.prov import listar_proveedores
 from Facturacion.gen_fact import gen_factura
+from Pedidos.gen_ped import gen_ped
 
 from tkinter import filedialog
 import os
@@ -108,7 +110,7 @@ class App_main:
 
         self.cr_ped = tk.IntVar()
         self.lis_ped = tk.IntVar()
-        self.menu_ped.menu.add_checkbutton(label='Crear pedido', variable=self.cr_ped, font=('Roboto Mono', 9))
+        self.menu_ped.menu.add_checkbutton(label='Crear pedido', variable=self.cr_ped, font=('Roboto Mono', 9), command=self.show_ped)
         self.menu_ped.menu.add_checkbutton(label='Listar pedidos', variable=self.lis_ped,  font=('Roboto Mono', 9))
         
         # Ventas
@@ -145,8 +147,8 @@ class App_main:
     def ImageLogo(self):
         self.frame1 = tk.Frame(self.main_content, bg='white', width=550)
         self.frame1.place(relx=0, rely=0, relwidth=1, relheight=1)
-        self.label1 = tk.Label(self.frame1,text="MEGAMERCADO", font=('Roboto Mono', 35), bg='white').place(relx=0.40, rely=0.65)
-        self.label2 = tk.Label(self.frame1,text="Calidad y Confianza", font=('Roboto Mono', 20), bg='white').place(relx=0.53, rely=0.76)
+        self.label1 = tk.Label(self.frame1,text="MEGAMERCADO", font=('Roboto Mono', 35), bg='white').place(relx=0.57, rely=0.70)
+        self.label2 = tk.Label(self.frame1,text="Calidad y Confianza", font=('Roboto Mono', 16), bg='white').place(relx=0.60, rely=0.80)
     
 
     # Muestran los botones de clientes, Proveedores y almacen
@@ -230,6 +232,12 @@ class App_main:
         self.main_content.grid()
         self._fact = gen_factura(self.main_content)
         self._fact.gen_prod()
+
+    def show_ped(self):
+        self.remove_frames()
+        self.main_content.grid()
+        self._ped = gen_ped(self.main_content)
+        self._ped.crear_ped()
 
     
     def start_cli(self):

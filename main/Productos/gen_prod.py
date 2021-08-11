@@ -23,7 +23,7 @@ class reg_prod_view():
         self.Prod_PrecioVenta = tk.IntVar(value='')
         self.Prod_Proveedor = tk.StringVar()
         self.Prod_CostoUnidad = tk.IntVar(value='')
-        self.Prod_ITBIS = tk.IntVar(value='')
+        #self.Prod_ITBIS = tk.IntVar(value='')
 
         self.Precio_venta = ''
         self.Costo_uni = ''
@@ -36,7 +36,7 @@ class reg_prod_view():
         self.reg_price = self._frame.register(self.validar_precio)
         #self.reg_prov = self._frame.register(self.validar_proveedor)
         self.reg_cost = self._frame.register(self.validar_costo)
-        self.reg_itbis = self._frame.register(self.validar_itbis)
+        #self.reg_itbis = self._frame.register(self.validar_itbis)
 
 
     # vista de registrar producto
@@ -69,7 +69,7 @@ class reg_prod_view():
         self.db_prov  = _db()
         _providers = self.db_prov.retrieve_providers_menu()
  
-        self.Prod_Proveedor.set(_providers[0])
+        self.Prod_Proveedor.set('Ninguno')
         self.supplier = tk.OptionMenu(self._frame, self.Prod_Proveedor, *_providers).grid(row=4, column=1, sticky='w', padx=5, pady=7, ipady=4)
         
 
@@ -79,13 +79,13 @@ class reg_prod_view():
         self.Prod_cost = tk.Entry(self._frame, textvariable=self.Prod_CostoUnidad, width=45, bg='#f2f4f6', validate='all', validatecommand=(self.reg_cost, '%P')).grid(row=5, column=1, sticky='w', padx=5, pady=7, ipady=4)
         
         # Creating itbis
-        self.itbis = tk.Label(self._frame, text='Itbis: ', font=('Roboto Mono', 11), bg='white', width=20, anchor='e')
-        self.itbis.grid(row=6, column=0, sticky='e', pady=7)
-        self.Prod_itbis = tk.Entry(self._frame, textvariable=self.Prod_ITBIS, width=45, bg='#f2f4f6', validate='all', validatecommand=(self.reg_itbis, '%P')).grid(row=6, column=1, sticky='w', padx=5, pady=5, ipady=4)
+        #self.itbis = tk.Label(self._frame, text='Itbis: ', font=('Roboto Mono', 11), bg='white', width=20, anchor='e')
+        #self.itbis.grid(row=6, column=0, sticky='e', pady=7)
+        #self.Prod_itbis = tk.Entry(self._frame, textvariable=self.Prod_ITBIS, width=45, bg='#f2f4f6', validate='all', validatecommand=(self.reg_itbis, '%P')).grid(row=6, column=1, sticky='w', padx=5, pady=5, ipady=4)
         
         # Creating buttons
-        self.btn_register = tk.Button(self._frame, text='Registrar', font=('Roboto Mono', 11), bg='#21A7DA', width=15, pady=3, command=self._submit).grid(row=9, column=0, columnspan=2, pady=(30, 30))
-        self.btn_delete = tk.Button(self._frame, text='Borrar todo', font=('Roboto Mono', 11), bg='#E10D0D', width=15, pady=3, command=self.borrar_todo).grid(row=9, column=1, columnspan=2, pady=(30, 30))
+        self.btn_register = tk.Button(self._frame, text='Registrar', font=('Roboto Mono', 11), bg='#21A7DA', width=15, pady=3, command=self._submit).grid(row=9, column=0, columnspan=2, pady=(45, 45))
+        self.btn_delete = tk.Button(self._frame, text='Borrar todo', font=('Roboto Mono', 11), bg='#E10D0D', width=15, pady=3, command=self.borrar_todo).grid(row=9, column=1, columnspan=2, pady=(45, 45))
 
     # Guardar formulario en la base de datos
     def _submit(self):
@@ -96,14 +96,14 @@ class reg_prod_view():
             self.price = self.Prod_PrecioVenta.get()
             self.supplierP = self.Prod_Proveedor.get()
             self.costo = self.Prod_CostoUnidad.get()
-            self.itbisP = self.Prod_ITBIS.get()
+            #self.itbisP = self.Prod_ITBIS.get()
 
 
-            self.sql = 'INSERT INTO dbo.Productos(Prod_Codigo, Prod_Nombre, Prod_PrecioVenta, Prod_Proveedor, Prod_CostoUnidad, Prod_ITBIS, Prod_Estatus) VALUES (?, ?, ?, ?, ?, ?, ?)'
+            self.sql = 'INSERT INTO dbo.Productos(Prod_Codigo, Prod_Nombre, Prod_PrecioVenta, Prod_Proveedor, Prod_CostoUnidad, Prod_Estatus) VALUES (?, ?, ?, ?, ?, ?)'
             self.sql_alm = 'INSERT INTO dbo.Almacenes(Alm_Producto) VALUES (?)'
             try:
                 self.conexion = _db()
-                self.conexion.conn_submit(self.sql, self.sql_alm, self.codigo, self.nameP, self.price, self.supplierP, self.costo, self.itbisP, 'A')
+                self.conexion.conn_submit(self.sql, self.sql_alm, self.codigo, self.nameP, self.price, self.supplierP, self.costo, 'A')
                 self.borrar_todo()
             except:
                 messagebox.showerror(title='Registro de producto', message='Complete la informacion correctamente')
@@ -119,7 +119,7 @@ class reg_prod_view():
         self.Prod_PrecioVenta.set('')
         self.Prod_Proveedor.set('Ninguno')
         self.Prod_CostoUnidad.set('')
-        self.Prod_ITBIS.set('')
+        #self.Prod_ITBIS.set('')
 
     # Validacion de codigo
     def validar_codigo(self, _input):
@@ -203,12 +203,12 @@ class reg_prod_view():
                     self.valid_values = False
                     return True
                 else:
-                    if self.num <= self.uni_cost:
+                    if (self.num - (self.num * 0.18)) <= self.uni_cost:
                         print(self.num)
                         print(type(self.num))
                         print(self.uni_cost)
                         print(type(self.uni_cost))
-                        tk.Label(self._frame, text='El precio de venta no puede \n ser menor que el costo', background='#EAEAEA', font=('Roboto Mono', 8), foreground='#E8222D', width=50).grid(row=3, column=2, sticky='w', ipady=5)
+                        tk.Label(self._frame, text='El precio de venta mas itbis no \n puede ser menor que el costo', background='#EAEAEA', font=('Roboto Mono', 8), foreground='#E8222D', width=50).grid(row=3, column=2, sticky='w', ipady=5)
                         self.valid_values = False
                         return True
                     else:
@@ -267,7 +267,7 @@ class reg_prod_view():
                     self.valid_values = True
                     return True
                 else:
-                    tk.Label(self._frame, text='El costo no puede ser mayor \n que el precio de venta', background='#EAEAEA', font=('Roboto Mono', 8), width=50).grid(row=5, column=2, sticky='w', ipady=5)
+                    tk.Label(self._frame, text='El costo no puede ser \n mayor que el precio de venta', background='#EAEAEA', font=('Roboto Mono', 8), width=50).grid(row=5, column=2, sticky='w', ipady=5)
                     self.valid_values = False
                     return True     
             else:
@@ -275,6 +275,7 @@ class reg_prod_view():
                 self.valid_values = False
                 return True
 
+    """
     # Validacion de itbis
     def validar_itbis(self, _input):
         self.input = _input
@@ -301,4 +302,4 @@ class reg_prod_view():
                 self.valid_values = False
                 return True
 
-
+    """

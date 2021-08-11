@@ -22,9 +22,9 @@ class _db():
         self.validate = 0
 
     # Registrar productos
-    def conn_submit(self, sql_prod, sql_alm, code,  name, price, provider, cost, itbis, estatus):
+    def conn_submit(self, sql_prod, sql_alm, code,  name, price, provider, cost, estatus):
         try:
-            self._cursor.execute(sql_prod, code, name, price, provider, cost, itbis, estatus)
+            self._cursor.execute(sql_prod, code, name, price, provider, cost, estatus)
 
             self._cursor.execute(sql_alm, code)
 
@@ -304,15 +304,21 @@ class _db():
             self._prods = 'SELECT Prod_Codigo FROM dbo.Productos'
 
             self.total_sales = 0
+            self.total_benefits = 0
+            self.total_itbis = 0
 
             for row in self._cursor.execute(self._prods):
                 self.sales.append(int(row[0]))
 
             for code in self.sales:
-                self.sql = 'SELECT Det_Producto, Det_Cantidad, Prod_Codigo, Prod_Nombre, Prod_PrecioVenta  FROM DetalleFacturas INNER JOIN Productos ON (Det_Producto = Prod_Codigo) WHERE (Det_Producto = {} and Det_Cantidad > 0)'.format(code)
+                self.sql = 'SELECT Det_Producto, Det_Cantidad, Prod_Codigo, Prod_Nombre, Prod_CostoUnidad, Prod_PrecioVenta  FROM DetalleFacturas INNER JOIN Productos ON (Det_Producto = Prod_Codigo) WHERE (Det_Producto = {} and Det_Cantidad > 0)'.format(code)
                 self.sale_price = 0
                 self.sale_amount = 0
                 self.final_sales = 0
+                self.costo = 0
+                self.benefits = 0
+                self.itbis = 0
+                self._itbis = 0.18
                 
 
                 self.pro_c = ''
@@ -323,19 +329,25 @@ class _db():
                         print('es cero')
                     else:
                         self.sale_amount = self.sale_amount + row[1]
-                        self.sale_price = row[4]
+                        self.sale_price = row[5]
+                        self.costo = row[4]
                         self.final_sales = self.sale_price * self.sale_amount
+                        self.itbis = float(self.final_sales) * self._itbis
+                        self.benefits = self.final_sales - (self.costo * self.sale_amount) - int(self.itbis)
                         self.pro_c = row[0]
                         self.pro_name = row[3]
+
                 
                 if self.sale_amount == 0:
                     print('Esta vacio')
                 else:
                     self.total_sales = self.total_sales + self.final_sales
-                    self._table.insert('', 0, values=(self.pro_c, self.pro_name, self.sale_amount,self.sale_price, self.final_sales))
+                    self.total_benefits = self.total_benefits + self.benefits
+                    self.total_itbis = self.total_itbis + self.itbis
+                    self._table.insert('', 0, values=(self.pro_c, self.pro_name, self.sale_amount, self.costo, self.sale_price, self.itbis, self.final_sales))
 
-                self.num_total_prod_title = tk.Label(self._frame, text='Total en ventas: '+str(self.total_sales)+'', bg='white', font=('Roboto Mono Bold', 8)).grid(row=4, column=0)
-                
+                self.num_total_sale = tk.Label(self._frame, text='Total en ventas: '+str(self.total_sales)+'   Total itbis: '+str(self.total_itbis)+'   Ganancias totales: '+str(self.total_benefits)+'', bg='white', font=('Roboto Mono Bold', 8)).grid(row=4, column=0)
+                #self.num_total_benefits= tk.Label(self._frame, text='Ganancias: '+str(self.total_benefits)+'', bg='white', font=('Roboto Mono Bold', 8)).grid(row=4, column=1)
             self._cursor.close()
             self.conn.close()
         except:
@@ -391,8 +403,70 @@ class _db():
             return self.prov
         except:
                 raise 
+
+    def retrieve_code_prod(self):
+        try:
+            self.sql = '''SELECT Prod_Codigo  FROM dbo.Productos'''
+            self.prod = []
+
+            self._array_ = self._cursor.execute(self.sql)
+
+            for row in self._array_:
+                self.prod.append(str(row[0]))
+
+            #for row in self._cursor.execute(self.sql):
+                #self.prod.append(row)
+                
+            self._cursor.close()
+            self.conn.close()
+
+            return self.prod
+        except:
+                raise 
+        
+    
+    def retrieve_name_prod(self):
+        try:
+            self.sql = '''SELECT Prod_Nombre  FROM dbo.Productos'''
+            self.prod = []
+
+            self._array_ = self._cursor.execute(self.sql)
+
+            for row in self._array_:
+                self.prod.append(str(row[0]))
+
+            #for row in self._cursor.execute(self.sql):
+                #self.prod.append(row)
+                
+            self._cursor.close()
+            self.conn.close()
+
+            return self.prod
+        except:
+                raise 
+
     
     
+    """
+   
+    def reg_ped(self, num, total, provider):
+        try:
+            self.sql = 'INSERT INTO Pedidos VALUES(?, ?, ?)'
+
+            self._cursor.execute(self.sql, num, total, provider)
+
+            self._cursor.execute(sql_alm, code)
+
+            self.conn.commit()
+            self._cursor.close()
+            self.conn.close()
+            messagebox.showinfo(title='Registro de producto', message='Producto registrado exitosamente')
+        except:
+            messagebox.showerror(title='Registro de producto', message='Ha ocurrido un error al registrar producto')
+            raise
+    
+     """
+
     # Validar el codigo de producto para evitar repeticion
     def validate_code(self, _input, _frame):
         self.input = _input
