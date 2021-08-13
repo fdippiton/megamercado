@@ -54,7 +54,7 @@ class Application:
         self._image_label = tk.Label(self.logo_image, image=self._logo_image, width=600,  height=600, bg='white').grid(column=0, row=0)
 
         # Register title
-        self.register_title = tk.Label(self.register, text='Registrar', font=('Roboto Mono Bold', 15), bg='white', width=50, height=2, anchor='n')
+        self.register_title = tk.Label(self.register, text=' ', font=('Roboto Mono Bold', 15), bg='white', width=50, height=2, anchor='n')
         self.register_title.grid(row=0, column=1, sticky='we', pady=(1, 5))
 
         # Administrator
@@ -70,12 +70,12 @@ class Application:
         #self.prov.grid(row=3, column=1, pady=(1, 40))
         
         # Supplier account
-        self.prov = tk.Label(self.register, text='Administrador ¿Ya tienes una cuenta?', font=('Roboto Mono', 10), bg='white')
-        self.prov.grid(row=4, column=1)
+        #self.prov = tk.Label(self.register, text='Administrador ¿Ya tienes una cuenta?', font=('Roboto Mono', 10), bg='white')
+        #self.prov.grid(row=4, column=1)
 
         # Login
-        self.login = tk.Button(self.register, text='Iniciar sesion', font=('Roboto Mono', 9), bg='white', fg='#4731D4')
-        self.login.grid(row=5, column=1, pady=(2, 20))
+        #self.login = tk.Button(self.register, text='Iniciar sesion', font=('Roboto Mono', 9), bg='white', fg='#4731D4')
+        #self.login.grid(row=5, column=1, pady=(2, 20))
 
     def _main_view(self):
         for widget in self.container.winfo_children(): # Toma todos los widgets de ese frame

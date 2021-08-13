@@ -19,6 +19,9 @@ from Proveedores.prov import listar_proveedores
 from Facturacion.gen_fact import gen_factura
 from Pedidos.gen_ped import gen_ped
 
+from Pedidos.list_ped import listar_pedidos
+from Facturacion.list_fact import listar_facturas
+
 from tkinter import filedialog
 import os
 import subprocess
@@ -111,7 +114,7 @@ class App_main:
         self.cr_ped = tk.IntVar()
         self.lis_ped = tk.IntVar()
         self.menu_ped.menu.add_checkbutton(label='Crear pedido', variable=self.cr_ped, font=('Roboto Mono', 9), command=self.show_ped)
-        self.menu_ped.menu.add_checkbutton(label='Listar pedidos', variable=self.lis_ped,  font=('Roboto Mono', 9))
+        self.menu_ped.menu.add_checkbutton(label='Listar pedidos', variable=self.lis_ped,  font=('Roboto Mono', 9), command=self.show_rpt_ped)
         
         # Ventas
         self.menu_ven = tk.Menubutton(self.menu_frame, text='Ventas', relief=RAISED,  font=('Roboto Mono Semibold', 10), borderwidth=2)
@@ -133,7 +136,7 @@ class App_main:
         self.gen_fact = tk.IntVar()
         self.lis_fact = tk.IntVar()
         self.menu_fac.menu.add_checkbutton(label='Generar factura', variable=self.gen_fact,  font=('Roboto Mono', 9), command=self.show_gen_fact)
-        self.menu_fac.menu.add_checkbutton(label='Listar factura', variable=self.lis_fact,  font=('Roboto Mono', 9))
+        self.menu_fac.menu.add_checkbutton(label='Listar factura', variable=self.lis_fact,  font=('Roboto Mono', 9), command=self.show_rpt_fac)
        
         
 
@@ -237,7 +240,21 @@ class App_main:
         self.remove_frames()
         self.main_content.grid()
         self._ped = gen_ped(self.main_content)
-        self._ped.crear_ped()
+        self._ped.crear_pedido()
+    
+    def show_rpt_ped(self):
+        self.remove_frames()
+        self.main_content.grid()
+        self._ped_rpt = listar_pedidos(self.main_content)
+        self._ped_rpt.list_ped_title()
+        self._ped_rpt.show_pedidos()
+    
+    def show_rpt_fac(self):
+        self.remove_frames()
+        self.main_content.grid()
+        self._fac_rpt = listar_facturas(self.main_content)
+        self._fac_rpt.list_fac_title()
+        self._fac_rpt.show_facturas()
 
     
     def start_cli(self):

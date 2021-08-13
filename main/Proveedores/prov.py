@@ -12,6 +12,7 @@ from DB.index import _db
 
 from reportlab.pdfgen import canvas
 import os
+import random
 
 
 class listar_proveedores():
@@ -67,6 +68,8 @@ class listar_proveedores():
 
         self.date = datetime.today().strftime('%Y-%m-%d')
 
+        rpt_num = random.randint(1, 10000)
+        
         try:
             rpt = canvas.Canvas('Listado de proveedores.pdf')
 
@@ -79,7 +82,7 @@ class listar_proveedores():
 
             rpt.drawString(500, 780, 'Usuario ADM')
             rpt.drawString(500, 765, 'Fecha: '+str(self.date)+'')
-            rpt.drawString(500, 750, 'Reporte:')
+            rpt.drawString(500, 750, 'Reporte: rpt-'+str(rpt_num)+'')
             rpt.drawString(500, 735, 'Pagina:')  
         
             rpt.drawString(35, 650, 'Codigo')

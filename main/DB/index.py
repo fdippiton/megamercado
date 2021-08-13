@@ -1,3 +1,4 @@
+import re
 from tkinter.constants import COMMAND
 from tkinter.ttk import Treeview
 import pyodbc
@@ -25,7 +26,6 @@ class _db():
     def conn_submit(self, sql_prod, sql_alm, code,  name, price, provider, cost, estatus):
         try:
             self._cursor.execute(sql_prod, code, name, price, provider, cost, estatus)
-
             self._cursor.execute(sql_alm, code)
 
             self.conn.commit()
@@ -85,7 +85,6 @@ class _db():
     # Generar reporte de los productos x almacen
     def retrieve_rpt_prod_alm(self):
         try:
-            #self.sql = '''SELECT * FROM dbo.Almacenes'''
             self.sql = 'SELECT Prod_Nombre, Prod_CostoUnidad, Alm_Producto, Alm_ValorInventario, Alm_UnidadesDisponibles FROM dbo.Productos FULL OUTER JOIN dbo.Almacenes ON (Prod_Codigo = Alm_Producto)'
             self.prods = []
 
@@ -94,7 +93,6 @@ class _db():
                 
             self._cursor.close()
             self.conn.close()
-
             return self.prods
         except:
                 raise 
@@ -111,8 +109,6 @@ class _db():
         try:
             self.sql = 'SELECT Prod_Nombre, Prod_PrecioVenta, Prod_Proveedor, Prod_CostoUnidad, Prod_ITBIS FROM dbo.Productos WHERE Prod_Codigo={}'.format(self.heading_code)
             self.items = self._cursor.execute(self.sql)
-            print(self.items)
-
             self._values = []
 
             for row in self.items:
@@ -131,7 +127,6 @@ class _db():
    
     # Guardar producto editado
     def save_edit(self, name, price, provider, cost, itbis, item_code):
-
         self.name = name
         self.price = price
         self.provider = provider
@@ -144,7 +139,6 @@ class _db():
         try:
             self._cursor.execute(self.sql, self._values)
             self.conn.commit()
-
 
             self._cursor.close()
             self.conn.close()
@@ -179,7 +173,6 @@ class _db():
                 
             self._cursor.close()
             self.conn.close()
-
             return self.total
         except:
                 raise 
@@ -195,7 +188,67 @@ class _db():
                 
             self._cursor.close()
             self.conn.close()
+            return self.prods
+        except:
+                raise 
+            
+            
+    def retrieve_all_pedidos(self, _frame, _table):
+        try:
+            self.sql = '''SELECT Ped_NoPedido, Ped_MontoTotal, Ped_Proveedor , Prov_Codigo, Prov_Nombre FROM dbo.Pedidos INNER JOIN dbo.Proveedores ON (Ped_Proveedor = Prov_Codigo)'''
+            self._tree = _table
+            self._frame = _frame
 
+            for row in self._cursor.execute(self.sql):
+                self._tree.insert('', 0, values= (row[0], row[1], row[4]))
+                
+            self._cursor.close()
+            self.conn.close()
+        except:
+                raise 
+
+
+    def retrieve_rpt_ped(self):
+        try:
+            self.sql = '''SELECT Ped_NoPedido, Ped_MontoTotal, Ped_Proveedor, Prov_Nombre FROM dbo.Pedidos FULL OUTER JOIN dbo.Proveedores ON (Ped_Proveedor = Prov_Codigo)'''
+            self.prods = []
+
+            for row in self._cursor.execute(self.sql):
+                self.prods.append(row)
+                
+            self._cursor.close()
+            self.conn.close()
+            return self.prods
+        except:
+                raise 
+
+
+    def retrieve_all_facturas(self, _frame, _table):
+        try:
+            self.sql = '''SELECT Fact_NoFactura, Fact_Fecha, Fact_Subtotal , Fact_TotalITBIS, Fact_Total, Fact_Cliente, Cli_Nombres  FROM dbo.Factura FULL OUTER JOIN dbo.Clientes ON (Fact_Cliente = Cli_Codigo)'''
+            self._tree = _table
+            self._frame = _frame
+
+            for row in self._cursor.execute(self.sql):
+                self._tree.insert('', 0, values= (row[0], row[1], row[2], row[3], row[4], row[6]))
+                
+            self._cursor.close()
+            self.conn.close()
+        except:
+                raise 
+            
+            
+    def retrieve_rpt_fac(self):
+        try:
+            self.sql = '''SELECT Fact_NoFactura, Fact_Fecha, Fact_Subtotal , Fact_TotalITBIS, Fact_Total, Fact_Cliente, Cli_Nombres FROM dbo.Factura FULL OUTER JOIN dbo.Clientes ON (Fact_Cliente = Cli_Codigo)'''
+            self.prods = []
+
+            for row in self._cursor.execute(self.sql):
+                self.prods.append(row)
+                
+            self._cursor.close()
+            self.conn.close()
+            print(self.prods)
             return self.prods
         except:
                 raise 
@@ -211,7 +264,6 @@ class _db():
                 
             self._cursor.close()
             self.conn.close()
-
             return self.prov
         except:
                 raise 
@@ -227,7 +279,6 @@ class _db():
                 
             self._cursor.close()
             self.conn.close()
-
             return self.total
         except:
                 raise 
@@ -239,11 +290,11 @@ class _db():
             self.total = 0
 
             for row in self._cursor.execute(self.sql):
-                self.total = self.total + row
+                self.total = self.total + int(row[0])
+                print(row[0])
                 
             self._cursor.close()
             self.conn.close()
-
             return self.total
         except:
                 raise 
@@ -255,11 +306,10 @@ class _db():
             self.total = 0
 
             for row in self._cursor.execute(self.sql):
-                self.total = self.total + row
+                self.total = self.total + row[0]
                 
             self._cursor.close()
             self.conn.close()
-
             return self.total
         except:
                 raise 
@@ -289,12 +339,12 @@ class _db():
                 
             self._cursor.close()
             self.conn.close()
-
             return self.cli
         except:
                 raise 
     
         # Generar reporte de ventas
+    """
     def retrieve_rpt_sales(self, _table, _frame):
         self._frame = _frame
         self._table = _table
@@ -353,6 +403,78 @@ class _db():
         except:
                 raise 
     
+    """
+    
+    # Generar reporte de ventas
+    def retrieve_rpt_sales(self, _table, _frame):
+        global rpt_venta_productos 
+        rpt_venta_productos = []
+        global rpt_venta_totales 
+        rpt_venta_totales = []
+        
+        self._frame = _frame
+        self._table = _table
+        try:
+            self.sales = []
+            self._prods = 'SELECT Prod_Codigo FROM dbo.Productos'
+
+            self.total_sales = 0
+            self.total_benefits = 0
+            self.total_itbis = 0
+
+            for row in self._cursor.execute(self._prods):
+                self.sales.append(int(row[0]))
+
+            for code in self.sales:
+                self.sql = 'SELECT Det_Producto, Det_Cantidad, Prod_Codigo, Prod_Nombre, Prod_CostoUnidad, Prod_PrecioVenta  FROM DetalleFacturas INNER JOIN Productos ON (Det_Producto = Prod_Codigo) WHERE (Det_Producto = {} and Det_Cantidad > 0)'.format(code)
+                self.sale_price = 0
+                self.sale_amount = 0
+                self.final_sales = 0
+                self.costo = 0
+                self.benefits = 0
+                self.itbis = 0
+                self._itbis = 0.18
+                self.total_total_sales = 0
+
+                self.pro_c = ''
+                self.pro_name = ''
+                
+                for row in self._cursor.execute(self.sql):
+                    if row[1] == 0:
+                        print('es cero')
+                    else:
+                        self.sale_amount = self.sale_amount + row[1]
+                        self.sale_price = row[5]
+                        self.costo = row[4]
+                        self.final_sales = self.sale_price * self.sale_amount
+                        self.itbis = float(self.final_sales) * self._itbis
+                        self.benefits = self.final_sales - (self.costo * self.sale_amount) - int(self.itbis)
+                        self.pro_c = row[0]
+                        self.pro_name = row[3]
+                
+                if self.sale_amount == 0:
+                    print('Esta vacio')
+                else:
+                    self.total_sales = self.total_sales + self.final_sales
+                    self.total_benefits = self.total_benefits + self.benefits
+                    self.total_itbis = self.total_itbis + self.itbis
+                    self.total_total_sales = float(self.final_sales) + self.total_itbis
+                    self._table.insert('', 0, values=(self.pro_c, self.pro_name, self.sale_amount, self.costo, self.sale_price, self.final_sales, self.itbis, self.total_total_sales))
+
+                    rpt_venta_productos.extend([[self.pro_c, self.pro_name, self.sale_amount, self.costo, self.sale_price, self.final_sales, self.itbis, self.total_total_sales]])
+                    rpt_venta_totales.extend([[self.total_sales, self.total_itbis, self.total_benefits]])
+
+                self.num_total_sale = tk.Label(self._frame, text='Subtotal en ventas: '+str(self.total_sales)+'   Total itbis: '+str(self.total_itbis)+'   Ganancias totales: '+str(self.total_benefits)+'', bg='white', font=('Roboto Mono Bold', 8)).grid(row=4, column=0)
+            self._cursor.close()
+            self.conn.close()
+        except:
+                raise 
+            
+    def rpt_venta_productos_array(self):
+        return rpt_venta_productos
+    
+    def rpt_venta_totales_productos_array(self):
+        return rpt_venta_totales
     
     # Obtener el total de clientes
     def retrieve_total_cli(self):
@@ -365,7 +487,6 @@ class _db():
                 
             self._cursor.close()
             self.conn.close()
-
             return self.total
         except:
                 raise 
@@ -390,19 +511,35 @@ class _db():
             self.prov = []
 
             self._array_ = self._cursor.execute(self.sql)
+            self.prov_ = self._cursor.execute(self.sql)
+            
+            for i in self.prov_:
+                self.prov.append(str(i[0]))
+            if len(self.prov) == 0:
+                self.prov = ['Ninguno']
 
-            for row in self._array_:
-                self.prov.append(str(row[0]))
-
-            #for row in self._cursor.execute(self.sql):
-                #self.prov.append(row)
-                
             self._cursor.close()
             self.conn.close()
-
             return self.prov
         except:
                 raise 
+    
+    def retrieve_code_prov(self, supplier_name):
+        try:
+            self._code_ = []
+            
+            # Obtener el codigo del proveedor
+            self.sql_provider = ''' SELECT Prov_Codigo FROM dbo.Proveedores WHERE Prov_Nombre = '{}' '''.format(supplier_name)
+            self.code = self._cursor.execute(self.sql_provider)
+            
+            for i in self.code:
+                self._code_.append(int(i[0]))
+          
+            self._cursor.close()
+            self.conn.close()
+            return self._code_[0]
+        except:
+            raise
 
     def retrieve_code_prod(self):
         try:
@@ -414,12 +551,8 @@ class _db():
             for row in self._array_:
                 self.prod.append(str(row[0]))
 
-            #for row in self._cursor.execute(self.sql):
-                #self.prod.append(row)
-                
             self._cursor.close()
             self.conn.close()
-
             return self.prod
         except:
                 raise 
@@ -435,12 +568,8 @@ class _db():
             for row in self._array_:
                 self.prod.append(str(row[0]))
 
-            #for row in self._cursor.execute(self.sql):
-                #self.prod.append(row)
-                
             self._cursor.close()
             self.conn.close()
-
             return self.prod
         except:
                 raise 

@@ -16,6 +16,7 @@ from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 
 import os
+import random
 
 
 class listar_prod():
@@ -85,6 +86,7 @@ class listar_prod():
         self._prods = self.rpt_db.retrieve_rpt_prod()
         self.date = datetime.today().strftime('%Y-%m-%d')
  
+        rpt_num = random.randint(1, 10000)
 
         try:
             rpt = canvas.Canvas('Listado de productos.pdf')
@@ -98,7 +100,7 @@ class listar_prod():
 
             rpt.drawString(500, 780, 'Usuario ADM')
             rpt.drawString(500, 765, 'Fecha: '+str(self.date)+'')
-            rpt.drawString(500, 750, 'Reporte:')
+            rpt.drawString(500, 750, 'Reporte:  rpt-'+str(rpt_num)+'')
             rpt.drawString(500, 735, 'Pagina:')  
         
             rpt.drawString(30, 650, 'Codigo')

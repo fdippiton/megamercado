@@ -11,6 +11,7 @@ from DB.index import _db
 from reportlab.pdfgen import canvas
 import os
 
+import random
 
 class listar_prod_alm():
     def __init__(self, _frame):
@@ -78,7 +79,8 @@ class listar_prod_alm():
         self.prod_alm = self.rpt_db.retrieve_rpt_prod_alm()
 
         self.date = datetime.today().strftime('%Y-%m-%d')
-
+        rpt_num = random.randint(1, 10000)
+        
         try:
             rpt = canvas.Canvas('Listado de productos x almacen.pdf')
 
@@ -91,7 +93,7 @@ class listar_prod_alm():
 
             rpt.drawString(500, 780, 'Usuario ADM')
             rpt.drawString(500, 765, 'Fecha: '+str(self.date)+'')
-            rpt.drawString(500, 750, 'Reporte:')
+            rpt.drawString(500, 750, 'Reporte: rpt-'+str(rpt_num)+'')
             rpt.drawString(500, 735, 'Pagina:')  
         
             rpt.drawString(50, 650, 'No. Almacen')

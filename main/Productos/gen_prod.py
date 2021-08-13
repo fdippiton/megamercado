@@ -97,13 +97,18 @@ class reg_prod_view():
             self.supplierP = self.Prod_Proveedor.get()
             self.costo = self.Prod_CostoUnidad.get()
             #self.itbisP = self.Prod_ITBIS.get()
-
+            
+           
 
             self.sql = 'INSERT INTO dbo.Productos(Prod_Codigo, Prod_Nombre, Prod_PrecioVenta, Prod_Proveedor, Prod_CostoUnidad, Prod_Estatus) VALUES (?, ?, ?, ?, ?, ?)'
             self.sql_alm = 'INSERT INTO dbo.Almacenes(Alm_Producto) VALUES (?)'
             try:
+                self.conn_provider = _db()
+                
+                # Obtener codigo de proveedor
+                self._code_ = self.conn_provider.retrieve_code_prov(self.supplierP)
                 self.conexion = _db()
-                self.conexion.conn_submit(self.sql, self.sql_alm, self.codigo, self.nameP, self.price, self.supplierP, self.costo, 'A')
+                self.conexion.conn_submit(self.sql, self.sql_alm, self.codigo, self.nameP, self.price, self._code_, self.costo, 'A')
                 self.borrar_todo()
             except:
                 messagebox.showerror(title='Registro de producto', message='Complete la informacion correctamente')
@@ -203,6 +208,50 @@ class reg_prod_view():
                     self.valid_values = False
                     return True
                 else:
+                    if self.num  <= self.uni_cost:
+                        print(self.num)
+                        print(type(self.num))
+                        print(self.uni_cost)
+                        print(type(self.uni_cost))
+                        tk.Label(self._frame, text='El precio de venta no \n puede ser menor que el costo', background='#EAEAEA', font=('Roboto Mono', 8), foreground='#E8222D', width=50).grid(row=3, column=2, sticky='w', ipady=5)
+                        self.valid_values = False
+                        return True
+                    else:
+                        tk.Label(self._frame, text='Correcto', background='#EAEAEA', font=('Roboto Mono', 8), width=50).grid(row=3, column=2, sticky='w', ipady=5)
+                        self.valid_values = True
+                        return True     
+            else:
+                tk.Label(self._frame, text='No se aceptan letras', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=3, column=2, sticky='w', ipady=5)
+                self.valid_values = False
+                return True
+    """
+    def validar_precio(self, _input):
+        self.input = _input
+        self.Precio_venta = self.input
+
+        self.uni_cost = ''
+
+        if self.Costo_uni == '':
+            self.Costo_uni = 0
+            self.uni_cost = self.Costo_uni
+        else:
+            self.uni_cost = int(self.Costo_uni)
+
+       
+        if self.input == '':
+            tk.Label(self._frame, text='Invalido. Esta vacio!', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=3, column=2, sticky='w', ipady=5)
+            self.valid_values = False
+            return True
+            
+        else:
+            if self.input.isdecimal():
+                self.num = int(self.input)
+
+                if self.num == 0:
+                    tk.Label(self._frame, text='El precio no puede ser cero', background='#EAEAEA', font=('Roboto Mono', 8), foreground='#E8222D', width=50).grid(row=3, column=2, sticky='w', ipady=5)
+                    self.valid_values = False
+                    return True
+                else:
                     if (self.num - (self.num * 0.18)) <= self.uni_cost:
                         print(self.num)
                         print(type(self.num))
@@ -220,7 +269,7 @@ class reg_prod_view():
                 self.valid_values = False
                 return True
 
-    """
+    
     # Validacion de proveedor
     def validar_proveedor(self, _input):
         self.input = _input

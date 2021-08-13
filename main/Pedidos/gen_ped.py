@@ -3,262 +3,399 @@ from tkinter import Label, messagebox
 from tkinter import Message, ttk
 from tkinter.constants import ANCHOR, S, SEL
 from tkinter.font import families
-from typing import Collection
+from typing import Collection, Text
 
 #from reportlab.lib.utils import c
 from fonts import *
 import pyodbc
 from DB.index import _db
 
+from tkinter import *
+from tkinter import ttk, messagebox
+from tkinter.font import BOLD, Font
+from datetime import datetime
+from reportlab.lib.enums import  TA_CENTER
+from reportlab.platypus import SimpleDocTemplate, paragraph
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import Table, TableStyle
+from reportlab.lib import colors
+import subprocess
 
+Fecha= datetime.now().strftime("%Y-%m-%d")
+ListaProductos=[]
 class gen_ped():
+    ITBIS=0.18
     def __init__(self, _frame):
         self._frame = _frame
 
-        self._ped = 0
-
-        self.Prod_Proveedor = tk.StringVar()
-        self.Prod_Codigo = tk.IntVar(value='')
-        self.Prod_Nombre = tk.StringVar()
-        self.Prod_cantidad = tk.IntVar(value='')
-
-        self._subtotal_total = []
-        self._total_itbis = []
-        self._total_total = []
-
-        self.productos = []
-        self.totales = []
-
-        self.tree_Table = ttk.Treeview(self._frame, height=8, columns=('#1', '#2', '#3', '#4', '#5', '#6', '#7'), show='headings')
+        self.conexionBD=pyodbc.connect('DRIVER={ODBC Driver 17 for SQL server};'
+                                'SERVER=DESKTOP-4IOJCET;'
+                                'DATABASE=MegaMercado;'
+                                'Trusted_Connection=yes;')
+        
+        self.tree_scrollbar=Scrollbar(self._frame)
+        self.grid1= ttk.Treeview(self._frame, height=5, columns=("#1","#2","#3","#4","#5","#6","#7"), show="headings",style="mystyle.Treeview",yscrollcommand=self.tree_scrollbar.set)
+        self.cantidadVar=tk.StringVar()
         
 
-
-    def crear_ped(self):
-        self.reg_prod_title = tk.Label(self._frame, text='Crear pedido', font=('Roboto Mono Bold', 15), bg='white', width=80)
-        self.reg_prod_title.grid(row=0, column=0, columnspan=3, pady=50)
-
-        #self.num_ped = tk.Label(self._frame, text='No. Pedido: '+str(self._ped)+'', bg='white', font=('Roboto Mono', 11)).grid(row=1, column=0)
+    def crear_pedido(self):
+        #TEXTO
+        #self.cantidadVar=tk.StringVar()
+        self.t1=tk.Label(self._frame, text= "Pedidos", font=("Roboto Mono",20,BOLD), bg="white").place(x=433, y=20)
+        self.t2=tk.Label(self._frame, text= Fecha, font=("Roboto Mono",12), bg="white").place(x=440, y=55)
+        self.t3=tk.Label(self._frame, text= "", font=("Roboto Mono",12), bg="white")
+        self.t3.place(x=427, y=75)
+        self.t4=tk.Label(self._frame, text= "Proveedor:", font=("Roboto Mono",12), bg="white").place(x=249, y=130)
+        self.t5=tk.Label(self._frame, text= "Producto:", font=("Roboto Mono",12), bg="white").place(x=256, y=165)
+        self.t6=tk.Label(self._frame, text= "", font=("Roboto Mono",12), bg="white")
+        self.t6.place(x=600, y=165)
+        self.t7=tk.Label(self._frame, text= "Cantidad:", font=("Roboto Mono",12), bg="white").place(x=255, y=200)
+        self.t8=tk.Label(self._frame, text= "", font=("Roboto Mono",12), bg="white")
+        self.t8.place(x=600, y=200)
+        self.t10=tk.Label(self._frame, text= "Precio:", font=("Roboto Mono",12), bg="white").place(x=520, y=165)
+        self.t12=tk.Label(self._frame, text= "", font=("Roboto Mono",12), bg="white")
+        self.t12.place(x=600, y=133)
+        self.t13=tk.Label(self._frame, text= '', font=("Roboto Mono",8, BOLD), fg='red', bg="white")
+        self.t13.place(x=125, y=205)
         
-        self.supplier = tk.Label(self._frame, text='Proveedor: ', font=('Roboto Mono', 11), bg='white', width=20, anchor='e').grid(row=1, column=1, sticky='e')
-        self.db_prov  = _db()
-        _providers = self.db_prov.retrieve_providers_menu()
-        self.Prod_Proveedor.set('Ninguno')
-        self.supplier = tk.OptionMenu(self._frame, self.Prod_Proveedor, *_providers).grid(row=1, column=2)
-
-
-        self.code = tk.Label(self._frame, text='Codigo de producto', bg='white', font=('Roboto Mono', 11)).grid(row=2, column=0)
-        self.db_pro  = _db()
-        self.Prod_Codigo.set('Ninguno')
-        _code = self.db_pro.retrieve_code_prod()
-        self.codes = tk.OptionMenu(self._frame, self.Prod_Codigo, *_code).grid(row=3, column=0)
+        #RESUMENES
+        self.Total=0.0
+        frame=tk.Frame(self._frame,width=141,height=100)
+        frame.config(bg="white",highlightbackground="gray",highlightthickness=1)
+        frame.place(x=667,y=410)
+        self.cantidadt=tk.Label(frame, text= "Cantidad:", font=("Roboto Mono",9,BOLD), bg="white").place(x=0,y=0)
+        self.subtotalt=tk.Label(frame, text= "Subtotal:", font=("Roboto Mono",9,BOLD), bg="white").place(x=0,y=25)       
+        self.ITBISt=tk.Label(frame, text= "ITBIS:", font=("Roboto Mono",9,BOLD), bg="white").place(x=0,y=50)
+        self.totalt=tk.Label(frame, text= "Total:", font=("Roboto Mono",9,BOLD), bg="white").place(x=0,y=75)
+        self.valorcantidadt=tk.Label(frame, text="", font=("Roboto Mono",10), bg="white")
+        self.valorcantidadt.place(x=65,y=12, anchor=W)
+        self.valorsubtotalt=tk.Label(frame, text="" , font=("Roboto Mono",10), bg="white")
+        self.valorsubtotalt.place(x=65,y=37, anchor=W)
+        self.valorITBISt=tk.Label(frame, text="" , font=("Roboto Mono",10), bg="white")
+        self.valorITBISt.place(x=65,y=60, anchor=W)
+        self.valortotalt=tk.Label(frame, text="" , font=("Roboto Mono",10), bg="white")
+        self.valortotalt.place(x=65,y=85,height=10, anchor=W)
         
-
-        # retrieve_name_prod
-        self.name = tk.Label(self._frame, text='Nombre de producto', bg='white', font=('Roboto Mono', 11)).grid(row=2, column=1)
-        self.db_pro_name  = _db()
-        self.Prod_Nombre.set('Ninguno')
-        _name = self.db_pro_name.retrieve_name_prod()
-        self.names = tk.OptionMenu(self._frame, self.Prod_Nombre, *_name).grid(row=3, column=1)
+        #ENTRYS
+        self.ComboBOXProv=ttk.Combobox(self._frame, value=self.obtenerValoresComboX(),width=18, font=("Roboto Mono",9))
+        self.ComboBOXProv.place(x=355,y=135)
+        self.ComboBOXProv.bind("<<ComboboxSelected>>", self.obtenerValor)
+        self.ComboBOXProvPro=ttk.Combobox(self._frame, width=18,font=("Roboto Mono",9))
+        self.ComboBOXProvPro.place(x=355,y=168)
+        self.ComboBOXProvPro.bind("<<ComboboxSelected>>", self.obtenerValorPrecio)
+        self.entryCant=tk.Entry(self._frame,validate="key", validatecommand=(frame.register(self.validate_entry), '%S','%P'),textvariable=self.cantidadVar,width=18,  font=("Roboto Mono",8), bg="#f9f9f9").place(x=355,y=203,height=23)
+        #SCROLLBAR
+        #tree_scrollbar=Scrollbar(self._frame)
+        self.tree_scrollbar.place(x=808,y=280,relheight=0.225)
         
-
-        self.amount = tk.Label(self._frame, text='Cantidad', bg='white', font=('Roboto Mono', 11)).grid(row=2, column=2)
-        self.cantidad = tk.Entry(self._frame, textvariable=self.Prod_cantidad, width=15, bg='#f2f4f6').grid(row=3, column=2)
-
-
-        self.btn_añadir = tk.Button(self._frame, text='Añadir', font=('Roboto Mono', 11), bg='#21A7DA', width=15, pady=3, command= lambda: self.agregar_prod(self.tree_Table )).grid(row=4, column=0)
-        self.btn_delete = tk.Button(self._frame, text='Limpiar', font=('Roboto Mono', 11), bg='#E10D0D', width=15, pady=3, command=self.limpiar).grid(row=4, column=1)
-
-        #self.tree_Table = ttk.Treeview(self._frame, height=8, columns=('#1', '#2', '#3', '#4', '#5', '#6', '#7'), show='headings')
-        self.tree_Table.grid(row=6, column=0, pady=5, columnspan=3)
-        self.tree_Table.heading('#1', text='Código de producto', anchor='center')
-        self.tree_Table.column('#1', minwidth=0, width=140, stretch='NO')
-        self.tree_Table.heading('#2', text='Nombre de producto', anchor='center')
-        self.tree_Table.column('#2', minwidth=0, width=140, stretch='NO')
-        self.tree_Table.heading('#3', text='Cantidad', anchor='center')
-        self.tree_Table.column('#3', minwidth=0, width=145, stretch='NO')
-        self.tree_Table.heading('#4', text='Costo unitario', anchor='center')
-        self.tree_Table.column('#4', minwidth=0, width=125, stretch='NO')
-        self.tree_Table.heading('#5', text='Subtotal', anchor='center')
-        self.tree_Table.column('#5', minwidth=0, width=145, stretch='NO')
-        self.tree_Table.heading('#6', text='Itbis', anchor='center')
-        self.tree_Table.column('#6', minwidth=0, width=100, stretch='NO')
-        self.tree_Table.heading('#7', text='Total a pagar', anchor='center')
-        self.tree_Table.column('#7', minwidth=0, width=145, stretch='NO')
-
-        self.scroll_tree = tk.Scrollbar(self._frame, orient='vertical', command=self.tree_Table.yview, width=20)
-        self.scroll_tree.grid(row=6, column=4, sticky='nsew')
-
-
-
-        self.btn_procesar = tk.Button(self._frame, text='Procesar pedido', font=('Roboto Mono', 11), bg='#21A7DA', width=15, pady=3, command=self._pedir).grid(row=8, column=0, pady=10)
-        self.btn_cancel = tk.Button(self._frame, text='Eliminar', font=('Roboto Mono', 11), bg='#E10D0D', width=15, pady=3, command=self.eliminar_elemento).grid(row=8, column=1, pady=10)
-
-        self.btn_cancel = tk.Button(self._frame, text='Cancelar', font=('Roboto Mono', 11), bg='#E10D0D', width=15, pady=3, command=self.cancelar).grid(row=8, column=2, pady=10)
-
-
-    def agregar_prod(self, _table):
-
-        self._table = _table
-
-        self._Proveedor = self.Prod_Codigo.get()
-        self._Codigo = self.Prod_Codigo.get()
-        self._Nombre = self.Prod_Nombre.get()
-        self._cantidad = self.Prod_cantidad.get()
-
-        #self.productos.append(self._Codigo, self._Nombre, self._cantidad)
-
-        self._db_ = _db()
-        self.sql = 'SELECT Prod_CostoUnidad FROM dbo.Productos WHERE Prod_Codigo = {}'.format(self._Codigo)
-
-        self._cursor = self._db_.conn.cursor()
-        self.cost = []
-        for a in self._cursor.execute(self.sql):
-            self.cost.append(a[0])
+        #TABLAS
+        style = ttk.Style()
+        style.configure("mystyle.Treeview", highlightthickness=0, bd=0, font=('Roboto Mono', 8)) 
+        style.configure("mystyle.Treeview.Heading", font=('Roboto Mono', 9, BOLD)) 
+        #self.grid1= ttk.Treeview(self._frame, height=5, columns=("#1","#2","#3","#4","#5","#6","#7"), show="headings",style="mystyle.Treeview",yscrollcommand=tree_scrollbar.set)
+        self.tree_scrollbar.config(command=self.grid1.yview)
+        self.grid1.place(x=130,y=280)
+        self.grid1.column("#1",width=75,anchor=CENTER)
+        self.grid1.heading("#1", text="Codigo", anchor=CENTER)
+        self.grid1.column("#2",width=100,anchor=CENTER)
+        self.grid1.heading("#2", text="Producto", anchor=CENTER)
+        self.grid1.column("#3",width=100,anchor=CENTER)
+        self.grid1.heading("#3", text="Costo", anchor=CENTER)
+        self.grid1.column("#4",width=100,anchor=CENTER)
+        self.grid1.heading("#4", text="Cantidad", anchor=CENTER)
+        self.grid1.column("#5",width=100,anchor=CENTER)
+        self.grid1.heading("#5", text="Subtotal", anchor=CENTER)
+        self.grid1.column("#6",width=100,anchor=CENTER)
+        self.grid1.heading("#6", text="ITBIS", anchor=CENTER)
+        self.grid1.column("#7",width=100,anchor=CENTER)
+        self.grid1.heading("#7", text="Total", anchor=CENTER)
         
-        self._subto = int(self.cost[0]) * self._cantidad
-        self._itbis = (self._subto * 0.18)
-        self._total = self._subto + (self._subto * 0.18)
-
-        self._table.insert('', 0, values= (str(self._Codigo), self._Nombre, str(self._cantidad), str(self.cost[0]), str(self._subto), str(round(self._itbis, 2)), str(self._total)))
-
-        self._subtotal_total.append(self._subto)
-        self._total_itbis.append(self._itbis)
-        self._total_total.append(self._total)
-
-        self.sum_subtotal_total = sum(self._subtotal_total)
-        self.sum_total_itbis = sum(self._total_itbis)
-        self.sum_total_total = sum(self._total_total)
-
-        self.sub = tk.Label(self._frame, text='Subtotal: '+str(self.sum_subtotal_total)+'').grid(row=7, column=0, pady=5)
-        self.itbis = tk.Label(self._frame, text='Itbis: '+str(round(self.sum_total_itbis, 2))+'').grid(row=7, column=1, pady=5)
-        self.total = tk.Label(self._frame, text='Total a pagar: '+str(self.sum_total_total)+'').grid(row=7, column=2, pady=5)
-
-        self.productos.extend([[self._Codigo, self._Nombre, self._cantidad, self.cost, self._subto]])
-        self.totales.extend([self.sum_total_total])
+        #BOTONES 
+        self.agregar=tk.Button(self._frame, text="Agregar",font=("Roboto Mono",10,BOLD),fg="#f9f9f9",bg="#41ba10", command=self.agregar, activebackground="#41ba10",activeforeground="#f9f9f9")
+        self.agregar.place(x=355,y=240,width=100)
+        self.eliminar=tk.Button(self._frame, text="Eliminar",font=("Roboto Mono",10,BOLD),fg="#f9f9f9",bg="#f00", command=self.eliminar,activebackground="#f00",activeforeground="#f9f9f9")
+        self.eliminar.place(x=480,y=240,width=100)
+        self.generar=tk.Button(self._frame, text="Generar",font=("Roboto Mono",10,BOLD),fg="#f9f9f9",bg="#21A7DA",command=self.AgregarFactura, activebackground="#56ABFF",activeforeground="#f9f9f9")
+        self.generar.place(x=355,y=450,width=100,height=40)
+        self.limpiar=tk.Button(self._frame, text="Limpiar",font=("Roboto Mono",10,BOLD),fg="#f9f9f9",bg="#21A7DA",command=self.limpiarTodo, activebackground="#56ABFF",activeforeground="#f9f9f9")
+        self.limpiar.place(x=480,y=450,width=100,height=40)
+        self.ObtenerNoFactura()
         
+    def validate_entry(self,text,new_text):
+        if len(new_text) > 5:
+            return False
+        return text.isdecimal()
+    
+    def validate_Codigos(self,text,new_text):
+        if len(new_text) > 11:
+            return False
+        return text.isdecimal()
 
+    def ObtenerNoFactura(self):
+        cur=self.conexionBD.cursor()
+        sql="Select TOP 1 Ped_NoPedido from Pedidos Order by Ped_NoPedido desc"
+        cur.execute(sql)
+        x=cur.fetchall()
+        for i in x:
+            variable=i[0]
+        sql="select count(*) from Pedidos"
+        cur.execute(sql)
+        x=cur.fetchall()
+        for i in x:
+            variable1=i[0]
+        if variable1==0:
+            self.t3.config(text="No. Pedido: 1")
+        else:
+            self.t3.config(text="No. Pedido: "+str(variable+1))
+        cur.commit()
+        cur.close()
 
-    def _pedir(self):
-
-        self._db_ = _db()
-        self._cursor = self._db_.conn.cursor()
-
-        self.number_ped = []
-
-        self.num_p = 'SELECT MAX(Ped_NoPedido) FROM Pedidos'
-        for i in self._cursor.execute(self.num_p):
-            self.b = int(i[0])
-            self.number_ped.append(self.b + 1)
+    def agregar(self):
+        try:
+         valorCantidad=int(self.cantidadVar.get())
+         valorCodigoProd=self.ComboBOXProvPro.get()
+         if valorCantidad>0:
+          self.t13.config(text='')
+          codigo=self.obtenerCodigoProduct(valorCodigoProd)
+          ITBS=float(self.ITBIS)
+          cantidad=int(self.cantidadVar.get())
+          cur=self.conexionBD.cursor()
+          sql="Select Prod_Nombre,Prod_CostoUnidad from Productos where Prod_Codigo={}".format(codigo)
+          cur.execute(sql)
+          x=cur.fetchall()
+          for i in x:
+                subtotal=round(cantidad*float(i[1]),2)
+                porcentajeITIBIS= round(subtotal*ITBS,2)
+                Total=round(subtotal+porcentajeITIBIS,2)
+                self.grid1.insert('',END,values=(codigo,i[0],i[1],cantidad,subtotal,porcentajeITIBIS,Total))
+          self.cantidadVar.set('0')
+          self.Resumenes()
+          cur.commit()
+          cur.close()
+         elif valorCantidad==0:
+            self.t13.config(text='Inserte Cantidad')
+        except TypeError:
+            self.ventanaError()
+        except ValueError:
+            self.t13.config(text='Inserte Cantidad')
         
-        self._Proveedor_ = self.Prod_Proveedor.get()
-        self.prov_code = 'SELECT Prov_Codigo, Prov_Nombre FROM dbo.Proveedores'
-        self.code_prov = []
-        for i in self._cursor.execute(self.prov_code):
-            if str(i[1]) == self._Proveedor_:
-                print(i[1])
-                self.code_prov.append(i[0])
-        print(self.code_prov[0])
+    def obtenerValoresComboX(self):
+        cur=self.conexionBD.cursor()
+        sql="Select Prov_Nombre from Proveedores"
+        cur.execute(sql)
+        x=cur.fetchall()
+        lista=[]
+        for i in x:
+            lista.append(i[0])
+        return lista
+    
+    def obtenerValoresComboXPRODCUTO(self,valor):
+        global ListaProductos
+        cur=self.conexionBD.cursor()
+        sql="Select Prov_Codigo from Proveedores Where Prov_Nombre='{}'".format(valor)
+        cur.execute(sql)
+        x=cur.fetchall()
+        for i in x:
+            provCodigo=int(i[0])
+        sql="Select Prod_Nombre from Productos Where Prod_Proveedor={}".format(provCodigo)
+        cur.execute(sql)
+        x=cur.fetchall()
+        ListaProductos=[]
+        for i in x:
+            ListaProductos.append(i[0])
+        self.ComboBOXProvPro.config(value=ListaProductos)
 
-        self.sql = 'INSERT INTO dbo.Pedidos VALUES(?,?,?)'
-        self._cursor.execute(self.sql, self.number_ped[0], self.totales[0], self.code_prov[0])
-        
+    def obtenerValor(self,e):
+        self.ComboBOXProvPro.set('')
+        self.t6.config(text='')
+        valor=self.ComboBOXProv.get()
+        self.obtenerValoresComboXPRODCUTO(valor)
 
-        for prod in self.productos:
-            self.num_pedido = self.number_ped[0]
-            self._Proveedor = self.Prod_Proveedor.get()
-            self._Codigo = prod[0]
-            self._Nombre = prod[1]
-            self._cantidad = prod[2]
-            self.cost = prod[3]
-            self._subto = prod[4]
-            
-            self._val_in = []
-            self._sql_in = 'SELECT Alm_Valorinventario FROM dbo.Almacenes WHERE (Alm_Producto = {})'.format(self._Codigo)
-            
+    def obtenerValorPrecio(self,e):
+        valor=self.ComboBOXProvPro.get()
+        self.obtenerPrecio(valor)
+
+    def obtenerPrecio(self, valor):
+        cur=self.conexionBD.cursor()
+        sql="Select Prod_CostoUnidad from Productos Where Prod_Nombre='{}'".format(valor)
+        cur.execute(sql)
+        x=cur.fetchall()
+        for i in x:
+            prodcutoPrecio=int(i[0])
+        self.t6.config(text='$'+ str(prodcutoPrecio)+'.00')
+    
+    def obtenerCodigoProduct(self,valor):
+        cur=self.conexionBD.cursor()
+        sql="Select Prod_Codigo from Productos Where Prod_Nombre='{}'".format(valor)
+        cur.execute(sql)
+        x=cur.fetchall()
+        for i in x:
+            return int(i[0])
+
+    def Resumenes(self):
+        self.TotalC=0
+        self.TotalSub=0.00
+        self.TotalITBS=0.00
+        self.TotalT=0.00
+        for child in self.grid1.get_children():
+            self.TotalC +=int((self.grid1.item(child, 'values')[3]))
+            self.TotalSub +=round(float((self.grid1.item(child, 'values')[4])),2)
+            self.TotalITBS +=round(float((self.grid1.item(child, 'values')[5])),2)
+            self.TotalT +=round(float((self.grid1.item(child, 'values')[6])),2)
+        self.valorITBISt.config(text=self.TotalITBS)
+        self.valortotalt.config(text=self.TotalT)
+        self.valorsubtotalt.config(text=self.TotalSub)
+        self.valorcantidadt.config(text=self.TotalC)
+
+    def AgregarFactura(self):
+        self.TotalC =0.00
+        self.TotalSub =0.00
+        self.TotalITBS =0.00
+        self.TotalT =0.00
+        valor=self.ComboBOXProv.get()
+        cur=self.conexionBD.cursor()
+        sql="Select Prov_Codigo from Proveedores Where Prov_Nombre='{}'".format(valor)
+        cur.execute(sql)
+        x=cur.fetchall()
+        for i in x:
+            provCodigo=int(i[0])
+        sql='Select * From Proveedores where Prov_Codigo={}'.format(provCodigo)
+        cur.execute(sql)
+        x=cur.fetchall()
+        for i in x:
+            ProveedorNombre=i[2]
+            CedulaRNC=i[5]
+            Direccion=i[1]
+            Telefono=i[4]
+        sql="Select TOP 1 Ped_NoPedido from Pedidos Order by Ped_NoPedido desc"
+        cur.execute(sql)
+        x=cur.fetchall()
+        for i in x:
+            variable=i[0]
+        sql="select count(*) from Pedidos"
+        cur.execute(sql)
+        x=cur.fetchall()
+        for i in x:
+            variable1=i[0]
+        if variable1==0:
+            self.Factura=1
+        else:
+            self.Factura=variable+1
+    
+        for child in self.grid1.get_children():
+                self.TotalC +=int((self.grid1.item(child, 'values')[3]))
+                self.TotalSub +=round(float((self.grid1.item(child, 'values')[4])),2)
+                self.TotalITBS +=round(float((self.grid1.item(child, 'values')[5])),2)
+                self.TotalT +=round(float((self.grid1.item(child, 'values')[6])),2)
+        for child in self.grid1.get_children():
+                self.codigo=int((self.grid1.item(child, 'values')[0]))
+                self.cantidad=int((self.grid1.item(child, 'values')[3]))
+                self.AgregarUnidadesAlmacen(self.codigo,self.cantidad)
+
+        if self.TotalC==0.0:
+            self.ventanaInfo()
+        else:
+            sql="INSERT INTO Pedidos (Ped_NoPedido,Ped_MontoTotal,Ped_Proveedor) values(?,?,?)"
             try:
-                for i in self._cursor.execute(self._sql_in):
-                    if i[0] is None:
-                        self._val_in.append(0)
-                    else:
-                        self._val_in.append(i[0])
-                self._val = sum(self._val_in)
-                print('Se obtuvo el valor de inventario')
-                print(self._val)
-            except:
-                print('No se obtuvo el valor del inventario')
-                raise
+                cur.execute(sql,self.Factura,self.TotalSub,provCodigo)
+                self.agregarDetalleFact(self.Factura)
+                self.pdf(self.Factura,self.TotalC,self.TotalSub,self.TotalITBS,self.TotalT,ProveedorNombre, CedulaRNC, Direccion,Telefono)
+                self.limpiarTodo()
+                self.ventanaExitosa()
+                self.ObtenerNoFactura()
+            except pyodbc.ProgrammingError:
+                self.ventanaError()
+        cur.commit()
+        cur.close()
 
+    def agregarDetalleFact(self,Factura):
+        cur=self.conexionBD.cursor()
+        sql='INSERT INTO DetallePedido (DetP_NoPedido,DetP_Cantidad,DetP_Producto,DetP_ProDescrp,Ped_NoAlmacen) values(?,?,?,?,?)'     
+        for child in self.grid1.get_children():
+            self.CodigoProducto=int(self.grid1.item(child,'values')[0])
+            self.Cantidad=int(self.grid1.item(child, 'values')[3])
+            self.Descripcion=self.grid1.item(child,'values')[1]
+            self.NoAlmacen=1
+            cur.execute(sql,Factura,self.Cantidad,self.CodigoProducto,self.Descripcion,self.CodigoProducto)
+        cur.commit()
+        cur.close()
 
-            self._uni = []
-            self._sql_uni = 'SELECT Alm_UnidadesDisponibles FROM dbo.Almacenes WHERE (Alm_Producto = {})'.format(self._Codigo)
-            
-            try:
-                for i in self._cursor.execute(self._sql_uni):
-                    if i == None:
-                        i = 0 
-                        self._uni.append(i)
-                    else:
-                        self._uni.append(i)
-                self._uni = sum(self._val_in)
-                print('Se obtuvieron las unidades disponibles')
-                print(self._uni)
-            except:
-                print('No se obtuvo las unidades disponibles')
-                raise
+    def AgregarUnidadesAlmacen(self,valor,cantidad):
+        cur=self.conexionBD.cursor()
+        sql='Select Alm_UnidadesDisponibles from Almacenes Where Alm_Producto={}'.format(valor)     
+        cur.execute(sql)
+        x=cur.fetchall()
+        uni = 0
 
+        for i in x:
+            uni = i[0]
+        if uni == None:
+            uni = 0
 
-            self._sql = 'INSERT INTO dbo.DetallePedido VALUES(?, ?, ?, ?, ?)'
+        total=uni+cantidad
+        sql='UPDATE Almacenes Set Alm_UnidadesDisponibles={} Where Alm_Producto={}'.format(total,valor)
+        cur.execute(sql)
+        cur.commit()
+        cur.close()
 
+    def limpiarTodo(self):
+        self.ComboBOXProv.set('')
+        self.ComboBOXProvPro.set('')
+        self.cantidadVar.set(0)
+        self.t6.config(text='')
+        for child in self.grid1.get_children():
+            self.grid1.delete(child)
+        self.valorITBISt.config(text=0.00)
+        self.valortotalt.config(text=0.00)
+        self.valorsubtotalt.config(text=0.00)
+        self.valorcantidadt.config(text=0.00)
+        
+    def ventanaError(self):
+        messagebox.showerror(message="No hay ningun producto agregado",title="Error")
 
-            self.alm_inv_ = self._val +  self.cost[0]
-            self.alm_uni_dis = self._uni + self._cantidad
+    def ventanaInfo(self):
+        messagebox.showinfo(message="Agregue productos para generar pedido",title="Informacion")
+        self.pdf()
 
- 
-            self._alm_val = 'UPDATE dbo.Almacenes SET Alm_ValorInventario=? WHERE Alm_Producto=?'
-            self._alm_uni = 'UPDATE dbo.Almacenes SET Alm_UnidadesDisponibles=? WHERE Alm_Producto=?'
+    def ventanaExitosa(self):
+        messagebox.showinfo(message="Se ha generado la pedido de manera exitosa",title="Informacion")
 
+    def eliminar(self):
+        x=self.grid1.selection()
+        for row in x:
+            self.grid1.delete(row)
+        self.Resumenes()
+    #CREATE PDF
+    def pdf(self,Factura,TotalCantidad, TotalSub, TotalITBIS,TotalT,clienteNombre, CedulaRNC, Direccion,Telefono):
+        lista=list()
+        titulos=list(('Codigo','Producto','Costo','Cantidad','Subtotal','ITBIS','Total'))
+        lista.append(titulos)
+        for child in self.grid1.get_children():
+            lista.append(self.grid1.item(child,'values'))
 
-            try:
-                #self._cursor.execute(self.sql, self.number_ped[0], self.sum_total_total, self.code_prov[0])
-                self._cursor.execute(self._sql, self.num_pedido, self._cantidad, self._Codigo, self._Nombre, self._Codigo)
-                self._cursor.execute(self._alm_val, self.alm_inv_, self._Codigo)
-                self._cursor.execute(self._alm_uni, self.alm_uni_dis, self._Codigo)
-                #self._cursor.execute(self._alm_val)
-                #self._cursor.execute(self._alm_uni)
-            except:
-                print('No se insertaron bien los registros')
-                raise
-       
-        self._db_.conn.commit()
-        self._cursor.close()
-        self._db_.conn.close()
-
-    def limpiar(self):
-        self.Prod_Proveedor.set('Ninguno')
-        self.Prod_Codigo.set('Ninguno')
-        self.Prod_Nombre.set('Ninguno')
-        self.Prod_cantidad.set('')
-
-
-
-    def eliminar_elemento(self):
-        self.heading_selected_code = self.tree_Table.selection()[0]
-
-        self.tree_Table.delete(self.heading_selected_code)
-
-    def cancelar(self):
-
-        self.Prod_Proveedor.set('Ninguno')
-        self.Prod_Codigo.set('Ninguno')
-        self.Prod_Nombre.set('Ninguno')
-        self.Prod_cantidad.set('')
-
-        self._subtotal_total.delete()
-        self._total_itbis.delete()
-        self._total_total.delete()
-
-        self.heading_selected_code = self.tree_Table.get_children()
-        for i in self.heading_selected_code:
-            self.tree_Table.delete(i)
-
-     
+        File_Name=Fecha+' NoPedido '+str(Factura)+'.pdf'
+        pdf= SimpleDocTemplate(File_Name, pagesize=letter)
+        style= TableStyle([('BACKGROUND',(0,0), (-1,0), colors.ReportLabBlueOLD),
+                            ('TEXTCOLOR',(0,0),(-1,0),colors.whitesmoke),
+                            ('ALIGN',(0,0),(-1,-1),'CENTER'),
+                            ('FONTNAME',(0,0),(-1,0),'Courier'),
+                            ('BOTTOMPADDING',(0,0),(-1,0),12),
+                            ('GRID',(0,1),(-1,-1),1,colors.black)])
+        table=Table(lista)
+        
+        table.setStyle(style)
+        elems=[]
+        stylep= ParagraphStyle('stylep',spaceBefore=6, alignment=TA_CENTER)
+        elems.append(paragraph.Paragraph("MEGAMERCADO",stylep))
+        elems.append(paragraph.Paragraph(Fecha,stylep))
+        elems.append(paragraph.Paragraph('No. Pedido: '+ str(Factura),stylep))
+        elems.append(paragraph.Paragraph("Proveedor: "+ clienteNombre + ' Cedula/RNC: ' +  str(CedulaRNC),stylep))
+        elems.append(paragraph.Paragraph("Direccion: " + str(Direccion)+' Telefono: ' + str(Telefono),stylep))
+        elems.append(table)
+        elems.append(paragraph.Paragraph("Cantidad Total: " + str(int(TotalCantidad)),stylep))
+        elems.append(paragraph.Paragraph("Subtotal: "+ str(TotalSub),stylep))
+        elems.append(paragraph.Paragraph("ITBIS Total: "+ str(TotalITBIS),stylep))
+        elems.append(paragraph.Paragraph("Total: "+ str(TotalT),stylep))
+        pdf.build(elems)
+        subprocess.Popen([File_Name], shell=True)       
