@@ -30,7 +30,7 @@ class listar_facturas():
         self.lis_prod_title.grid(row=1, column=0, columnspan=2, padx=320, pady=5, sticky='ew')
 
     def show_facturas(self):
-        self.tree_Table = ttk.Treeview(self._frame, height=15, columns=('#1', '#2', '#3', '#4', '#5', '#6'), show='headings')
+        self.tree_Table = ttk.Treeview(self._frame, height=14, columns=('#1', '#2', '#3', '#4', '#5', '#6'), show='headings', style='estilos.Treeview')
         self.tree_Table.grid(row=3, column=0)
         self.tree_Table.heading('#1', text='Numero de factura', anchor='center')
         self.tree_Table.column('#1', minwidth=0, width=157, stretch='NO')
@@ -44,13 +44,17 @@ class listar_facturas():
         self.tree_Table.heading('#5', text='Total', anchor='center')
         self.tree_Table.column('#6', minwidth=0, width=157, stretch='NO')
         self.tree_Table.heading('#6', text='Cliente', anchor='center')
+        
+        style = ttk.Style()
+        style.configure('Treeview.Heading', font=('Roboto Mono Bold', 9))
+        style.configure('estilos.Treeview', font=('Roboto Mono', 8), background='#78fee0')
 
 
         self.scroll_tree = tk.Scrollbar(self._frame, orient='vertical', command=self.tree_Table.yview, width=20)
         self.scroll_tree.grid(row=3, column=1, sticky='nsew')
 
         #self.num_total_clientes = tk.Label(self._frame, text='Número total de clientes: '+self.str_num_total_cli+'', bg='white', font=('Roboto Mono Bold', 8)).grid(row=4, column=0, pady=5)
-        tk.Button(self._frame, text='Generar reporte', command=self.gen_reporte_fact, font=('Roboto Mono', 8)).grid(row=5, column=0, pady=20)
+        tk.Button(self._frame, text='Generar reporte', command=self.gen_reporte_fact, font=('Roboto Mono', 8)).grid(row=5, column=0, pady=25)
 
 
         self._retrieve_ped = _db()
@@ -71,7 +75,7 @@ class listar_facturas():
 
         rpt_num = random.randint(1, 10000)
         try:
-            rpt = canvas.Canvas('Listado de facturas.pdf')
+            rpt = canvas.Canvas('Listado de facturas rpt-'+str(rpt_num)+'.pdf')
 
             rpt.setLineWidth(.3)
             rpt.setFont('Times-Roman', 8)
@@ -110,6 +114,6 @@ class listar_facturas():
             #rpt.drawString(130, self._ct, self.num_cli)
             
             rpt.save()
-            os.startfile('Listado de facturas.pdf')
+            os.startfile('Listado de facturas rpt-'+str(rpt_num)+'.pdf')
         except:
             raise

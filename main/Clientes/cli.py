@@ -2,8 +2,11 @@ import tkinter as tk
 import tkinter as ttk
 from tkinter import messagebox
 from tkinter import Message, ttk
+from tkinter import font
 from tkinter.constants import S
 from tkinter.font import families
+
+from reportlab.lib import styles
 from fonts import *
 import pyodbc
 from DB.index import _db
@@ -29,9 +32,9 @@ class listar_clientes():
         self.lis_prod_title.grid(row=1, column=0, columnspan=2, padx=330, pady=5, sticky='ew')
 
     def show_list_cli(self):
-        self.tree_Table = ttk.Treeview(self._frame, height=13, columns=('#1', '#2', '#3', '#4', '#5', '#6'), show='headings')
+        self.tree_Table = ttk.Treeview(self._frame, height=13, columns=('#1', '#2', '#3', '#4', '#5', '#6'), show='headings', style='estilo.Treeview')
         self.tree_Table.grid(row=3, column=0)
-        self.tree_Table.heading('#1', text='Codigo', anchor='center')
+        self.tree_Table.heading('#1', text='Código', anchor='center')
         self.tree_Table.column('#1', minwidth=0, width=157, stretch='NO')
         self.tree_Table.heading('#2', text='Nombres', anchor='center')
         self.tree_Table.column('#2', minwidth=0, width=157, stretch='NO')
@@ -39,10 +42,15 @@ class listar_clientes():
         self.tree_Table.column('#3', minwidth=0, width=157, stretch='NO')
         self.tree_Table.heading('#4', text='RNC/Cedula', anchor='center')
         self.tree_Table.column('#4', minwidth=0, width=157, stretch='NO')
-        self.tree_Table.heading('#5', text='Telefono', anchor='center')
+        self.tree_Table.heading('#5', text='Teléfono', anchor='center')
         self.tree_Table.column('#5', minwidth=0, width=157, stretch='NO')
-        self.tree_Table.heading('#6', text='Direccion', anchor='center')
+        self.tree_Table.heading('#6', text='Dirección', anchor='center')
         self.tree_Table.column('#6', minwidth=0, width=157, stretch='NO')
+        
+        style = ttk.Style()
+        style.configure('Treeview.Heading', font=('Roboto Mono Bold', 9))
+        style.configure('estilo.Treeview', font=('Roboto Mono', 8))
+        #style.configure('Treeview',  background='#78fee0', foreground='Black')
 
         self.scroll_tree = tk.Scrollbar(self._frame, orient='vertical', command=self.tree_Table.yview, width=20)
         self.scroll_tree.grid(row=3, column=1, sticky='nsew')
@@ -66,11 +74,13 @@ class listar_clientes():
         self._cli = self.rpt_db.retrieve_rpt_cli()
 
         self.date = datetime.today().strftime('%Y-%m-%d')
+        self._date = datetime.today()
+        
         
         rpt_num = random.randint(1, 10000)
 
         try:
-            rpt = canvas.Canvas('Listado de clientes.pdf')
+            rpt = canvas.Canvas('Listado de clientes rpt-'+str(rpt_num)+'.pdf')
 
             rpt.setLineWidth(.3)
             rpt.setFont('Times-Roman', 8)
@@ -82,14 +92,14 @@ class listar_clientes():
             rpt.drawString(500, 780, 'Usuario ADM')
             rpt.drawString(500, 765, 'Fecha: '+str(self.date)+'')
             rpt.drawString(500, 750, 'Reporte: rpt-'+str(rpt_num)+'')
-            rpt.drawString(500, 735, 'Pagina:')  
+            rpt.drawString(500, 735, 'Página:')  
         
-            rpt.drawString(50, 650, 'Codigo')
+            rpt.drawString(50, 650, 'Código')
             rpt.drawString(125, 650, 'Nombres')
             rpt.drawString(200, 650, 'Apellidos')
             rpt.drawString(275, 650, 'RNC/Cedula')
-            rpt.drawString(350, 650, 'Telefono')
-            rpt.drawString(425, 650, 'Direccion')
+            rpt.drawString(350, 650, 'Teléfono')
+            rpt.drawString(425, 650, 'Dirección')
             rpt.line(30, 645, 500, 645)
 
             self.count = 630
@@ -106,9 +116,9 @@ class listar_clientes():
             self.num_cli = str(self.total_cli())
             self._ct = self.count - 20
             rpt.drawString(50, self._ct, 'Número total de clientes:  ')
-            rpt.drawString(130, self._ct, self.num_cli)
+            rpt.drawString(135, self._ct, self.num_cli)
             
             rpt.save()
-            os.startfile('Listado de clientes.pdf')
+            os.startfile('Listado de clientes rpt-'+str(rpt_num)+'.pdf')
         except:
             raise

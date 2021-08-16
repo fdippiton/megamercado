@@ -35,21 +35,21 @@ class rpt_ventas():
         self.lis_prod_title.grid(row=0, column=0, columnspan=2, padx=330, pady=20, sticky='ew')
 
         self.lis_prod_title = tk.Label(self._frame, text='Reporte de ventas', font=('Roboto Mono', 13), bg='white')
-        self.lis_prod_title.grid(row=1, column=0, columnspan=2, padx=330, pady=5, sticky='ew')
+        self.lis_prod_title.grid(row=1, column=0, columnspan=2, padx=335, pady=5, sticky='ew')
 
         #self.btn_retrieve = tk.Button(self._frame, text='Listar productos', font=('Roboto Mono', 12), bg='#21A7DA', width=20, pady=3, command=self.show_list).grid(row=9, column=0, sticky='e', pady=185, padx=90)
 
     def show_rpt_ventas(self):
-        self.tree_Table = ttk.Treeview(self._frame, height=15, columns=('#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8'), show='headings')
+        self.tree_Table = ttk.Treeview(self._frame, height=15, columns=('#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8'), show='headings', style='estilo_sales.Treeview')
         self.tree_Table.grid(row=3, column=0, pady=5)
         self.tree_Table.heading('#1', text='Código de producto', anchor='center')
         self.tree_Table.column('#1', minwidth=0, width=140, stretch='NO')
-        self.tree_Table.heading('#2', text='Nombre de producto', anchor='center')
-        self.tree_Table.column('#2', minwidth=0, width=140, stretch='NO')
+        self.tree_Table.heading('#2', text='Producto', anchor='center')
+        self.tree_Table.column('#2', minwidth=0, width=120, stretch='NO')
         self.tree_Table.heading('#3', text='Unidades vendidas', anchor='center')
         self.tree_Table.column('#3', minwidth=0, width=140, stretch='NO')
         self.tree_Table.heading('#4', text='Costo', anchor='center')
-        self.tree_Table.column('#4', minwidth=0, width=80, stretch='NO')
+        self.tree_Table.column('#4', minwidth=0, width=75, stretch='NO')
         self.tree_Table.heading('#5', text='Precio de venta', anchor='center')
         self.tree_Table.column('#5', minwidth=0, width=120, stretch='NO')
         self.tree_Table.heading('#6', text='Subtotal', anchor='center')
@@ -57,7 +57,12 @@ class rpt_ventas():
         self.tree_Table.heading('#7', text='Total itbis', anchor='center')
         self.tree_Table.column('#7', minwidth=0, width=100, stretch='NO')
         self.tree_Table.heading('#8', text='Ventas *Itbis incluidos', anchor='center')
-        self.tree_Table.column('#8', minwidth=0, width=145, stretch='NO')
+        self.tree_Table.column('#8', minwidth=0, width=170, stretch='NO')
+        
+        style = ttk.Style()
+        style.configure('Treeview.Heading', font=('Roboto Mono Bold', 8), height=2)
+        style.configure('estilo_sales.Treeview', font=('Roboto Mono', 8))
+        #style.configure('Treeview',  background='#78fee0')
         
         self.scroll_tree = tk.Scrollbar(self._frame, orient='vertical', command=self.tree_Table.yview, width=20)
         self.scroll_tree.grid(row=3, column=1, sticky='nsew')
@@ -81,7 +86,7 @@ class rpt_ventas():
         rpt_num = random.randint(1, 10000)
 
         try:
-            rpt = canvas.Canvas('Reporte de ventas.pdf')
+            rpt = canvas.Canvas('Reporte de ventas rpt-'+str(rpt_num)+'.pdf')
 
             rpt.setLineWidth(.3)
             rpt.setFont('Times-Roman', 8)
@@ -124,7 +129,7 @@ class rpt_ventas():
             rpt.drawString(300, self._ct, 'Ganacias totales:  '+str(self.sales_totals[0][2])+'')
             
             rpt.save()
-            os.startfile('Reporte de ventas.pdf')
+            os.startfile('Reporte de ventas rpt-'+str(rpt_num)+'.pdf')
         except:
             raise
         

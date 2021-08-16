@@ -150,23 +150,23 @@ class App_main:
     def ImageLogo(self):
         self.frame1 = tk.Frame(self.main_content, bg='white', width=550)
         self.frame1.place(relx=0, rely=0, relwidth=1, relheight=1)
-        self.label1 = tk.Label(self.frame1,text="MEGAMERCADO", font=('Roboto Mono', 35), bg='white').place(relx=0.57, rely=0.70)
-        self.label2 = tk.Label(self.frame1,text="Calidad y Confianza", font=('Roboto Mono', 16), bg='white').place(relx=0.60, rely=0.80)
+        self.label1 = tk.Label(self.frame1,text="MEGAMERCADO", font=('Roboto Mono', 25), bg='white', foreground='#dadada').place(relx=0.65, rely=0.75)
+        self.label2 = tk.Label(self.frame1,text="Calidad y Confianza", font=('Roboto Mono', 13), bg='white', foreground='#dadada').place(relx=0.67, rely=0.83)
     
 
     # Muestran los botones de clientes, Proveedores y almacen
     def button(self):
-        self.Btn1 = tk.Button(self.frame1, text="Clientes", bg="white", font=('Roboto Mono Semibold', 12), command=self.show_all_cli, width=18, height=2, borderwidth=3).place(relx=0.30,rely=0.20)
-        self.Btn2 = tk.Button(self.frame1, text="Proveedores", bg="white", font=('Roboto Mono Semibold', 12), command=self.show_all_providers, width=18, height=2, borderwidth=3).place(relx=0.53,rely=0.20)
-        self.Btn3 = tk.Button(self.frame1, text="Almacén", bg="white", font=('Roboto Mono Semibold', 12), width=22, height=2, borderwidth=3).place(relx=0.15,rely=0.45)
+        self.Btn1 = tk.Button(self.frame1, text="CLIENTES", bg="white", font=('Roboto Mono Semibold', 12), command=self.show_all_cli, width=22, height=4, borderwidth=3).place(relx=0.20,rely=0.20)
+        self.Btn2 = tk.Button(self.frame1, text="PROVEEDORES", bg="white", font=('Roboto Mono Semibold', 12), command=self.show_all_providers, width=22, height=4, borderwidth=3).place(relx=0.53,rely=0.20)
+        #self.Btn3 = tk.Button(self.frame1, text="Almacén", bg="white", font=('Roboto Mono Semibold', 12), width=22, height=2, borderwidth=3).place(relx=0.15,rely=0.45)
         
          # Client
-        self.client = tk.Button(self.frame1, text=' Registrar cliente', bg="white", font=('Roboto Mono Semibold', 12), width=22, height=2, borderwidth=3, command=self.start_cli)
-        self.client.place(relx=0.40,rely=0.45)
+        self.client = tk.Button(self.frame1, text=' REGISTRAR\nCLIENTE', bg="white", font=('Roboto Mono Semibold', 12), width=22, height=4, borderwidth=3, command=self.start_cli)
+        self.client.place(relx=0.20,rely=0.45)
 
         # Supplier
-        self.prov = tk.Button(self.frame1, text='Registrar proveedor', bg="white", font=('Roboto Mono Semibold', 12), width=22, height=2, borderwidth=3, command=self.start_prov)
-        self.prov.place(relx=0.65,rely=0.45)
+        self.prov = tk.Button(self.frame1, text='REGISTRAR\nPROVEEDOR', bg="white", font=('Roboto Mono Semibold', 12), width=22, height=4, borderwidth=3, command=self.start_prov)
+        self.prov.place(relx=0.53,rely=0.45)
 
     # Mostrar registrar producto
     def show_reg_prod(self):

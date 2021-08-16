@@ -37,7 +37,7 @@ class listar_prod():
 
     # Mostrar el listado de productos
     def show_list(self):
-        self.tree_Table = ttk.Treeview(self._frame, height=11, columns=('#1', '#2', '#3', '#4', '#5', '#6', '#7'), show='headings')
+        self.tree_Table = ttk.Treeview(self._frame, height=11, columns=('#1', '#2', '#3', '#4', '#5', '#6', '#7'), show='headings', style='estilo_prod.Treeview')
         self.tree_Table.grid(row=3, column=0)
         self.tree_Table.heading('#1', text='Codigo', anchor='center')
         self.tree_Table.column('#1', minwidth=0, width=135, stretch='NO')
@@ -53,6 +53,10 @@ class listar_prod():
         self.tree_Table.column('#6', minwidth=0, width=135, stretch='NO')
         self.tree_Table.heading('#7', text='Estatus', anchor='center')
         self.tree_Table.column('#7', minwidth=0, width=135, stretch='NO')
+        
+        style = ttk.Style()
+        style.configure('Treeview.Heading', font=('Roboto Mono Bold', 9))
+        style.configure('estilo_prod.Treeview', font=('Roboto Mono', 8), background='#78fee0')
 
 
         self.scroll_tree = tk.Scrollbar(self._frame, orient='vertical', command=self.tree_Table.yview, width=20)
@@ -89,7 +93,7 @@ class listar_prod():
         rpt_num = random.randint(1, 10000)
 
         try:
-            rpt = canvas.Canvas('Listado de productos.pdf')
+            rpt = canvas.Canvas('Listado de productos rpt-'+str(rpt_num)+'.pdf')
 
             rpt.setLineWidth(.3)
             rpt.setFont('Times-Roman', 8)
@@ -130,7 +134,7 @@ class listar_prod():
             rpt.drawString(130, self._ct, self.num_prod)
 
             rpt.save()
-            os.startfile('Listado de productos.pdf')
+            os.startfile('Listado de productos rpt-'+str(rpt_num)+'.pdf')
         except:
             raise
 

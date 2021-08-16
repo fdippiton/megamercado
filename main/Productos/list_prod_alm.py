@@ -36,7 +36,7 @@ class listar_prod_alm():
 
     # Mostrar todos los productos en el treeview
     def show_list_prod_alm(self):
-        self.tree_Table = ttk.Treeview(self._frame, height=12, columns=('#1', '#2', '#3', '#4', '#5'), show='headings')
+        self.tree_Table = ttk.Treeview(self._frame, height=12, columns=('#1', '#2', '#3', '#4', '#5'), show='headings', style='estilo_alm.Treeview')
         self.tree_Table.grid(row=3, column=0)
         self.tree_Table.heading('#1', text='No. Almacén', anchor='center')
         self.tree_Table.column('#1', minwidth=0, width=189, stretch='NO')
@@ -48,6 +48,10 @@ class listar_prod_alm():
         self.tree_Table.column('#4', minwidth=0, width=189, stretch='NO')
         self.tree_Table.heading('#5', text='Unidades disponibles', anchor='center')
         self.tree_Table.column('#5', minwidth=0, width=189, stretch='NO')
+        
+        style = ttk.Style()
+        style.configure('Treeview.Heading', font=('Roboto Mono Bold', 9))
+        style.configure('estilo_alm.Treeview', font=('Roboto Mono', 8), background='#78fee0')
 
         self.scroll_tree = tk.Scrollbar(self._frame, orient='vertical', command=self.tree_Table.yview, width=20)
         self.scroll_tree.grid(row=3, column=1, sticky='nsew')
@@ -82,7 +86,7 @@ class listar_prod_alm():
         rpt_num = random.randint(1, 10000)
         
         try:
-            rpt = canvas.Canvas('Listado de productos x almacen.pdf')
+            rpt = canvas.Canvas('Listado de productos x almacen rpt-'+str(rpt_num)+'.pdf')
 
             rpt.setLineWidth(.3)
             rpt.setFont('Times-Roman', 8)
@@ -114,6 +118,6 @@ class listar_prod_alm():
 
             
             rpt.save()
-            os.startfile('Listado de productos x almacen.pdf')
+            os.startfile('Listado de productos x almacen rpt-'+str(rpt_num)+'.pdf')
         except:
             raise

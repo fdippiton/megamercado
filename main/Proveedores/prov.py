@@ -31,25 +31,29 @@ class listar_proveedores():
 
 
     def show_list_prov(self):
-        self.tree_Table = ttk.Treeview(self._frame, height=13, columns=('#1', '#2', '#3', '#4', '#5', '#6'), show='headings')
+        self.tree_Table = ttk.Treeview(self._frame, height=13, columns=('#1', '#2', '#3', '#4', '#5', '#6'), show='headings', style='estilo_prov.Treeview')
         self.tree_Table.grid(row=3, column=0)
-        self.tree_Table.heading('#1', text='Codigo', anchor='center')
+        self.tree_Table.heading('#1', text='Código', anchor='center')
         self.tree_Table.column('#1', minwidth=0, width=157, stretch='NO')
         self.tree_Table.heading('#2', text='Nombre', anchor='center')
         self.tree_Table.column('#2', minwidth=0, width=157, stretch='NO')
-        self.tree_Table.heading('#3', text='Direccion', anchor='center')
+        self.tree_Table.heading('#3', text='Dirección', anchor='center')
         self.tree_Table.column('#3', minwidth=0, width=157, stretch='NO')
-        self.tree_Table.heading('#4', text='RNC/Cedula', anchor='center')
-        self.tree_Table.column('#4', minwidth=0, width=157, stretch='NO')
-        self.tree_Table.heading('#5', text='Telefono', anchor='center')
-        self.tree_Table.column('#5', minwidth=0, width=157, stretch='NO')
+        self.tree_Table.heading('#4', text='RNC/Cédula', anchor='center')
+        self.tree_Table.column('#4', minwidth=0, width=100, stretch='NO')
+        self.tree_Table.heading('#5', text='Teléfono', anchor='center')
+        self.tree_Table.column('#5', minwidth=0, width=130, stretch='NO')
         self.tree_Table.heading('#6', text='Tipo', anchor='center')
-        self.tree_Table.column('#6', minwidth=0, width=157, stretch='NO')
+        self.tree_Table.column('#6', minwidth=0, width=240, stretch='NO')
+        
+        style = ttk.Style()
+        style.configure('Treeview.Heading', font=('Roboto Mono Bold', 9))
+        style.configure('estilo_prov.Treeview', font=('Roboto Mono', 8), background='#78fee0')
 
         self.scroll_tree = tk.Scrollbar(self._frame, orient='vertical', command=self.tree_Table.yview, width=20)
         self.scroll_tree.grid(row=3, column=1, sticky='nsew')
 
-        self.num_total_prov = tk.Label(self._frame, text='Numero total de proveedores: '+self.num_total_prov+'', bg='white',  font=('Roboto Mono Bold', 8)).grid(row=4, column=0, pady=5)
+        self.num_total_prov = tk.Label(self._frame, text='Número total de proveedores: '+self.num_total_prov+'', bg='white',  font=('Roboto Mono Bold', 8)).grid(row=4, column=0, pady=5)
         tk.Button(self._frame, text='Generar reporte', command=self.gen_reporte_prov, font=('Roboto Mono', 8)).grid(row=5, column=0, pady=20)
         
         self._retrieve_prov = _db()
@@ -71,7 +75,7 @@ class listar_proveedores():
         rpt_num = random.randint(1, 10000)
         
         try:
-            rpt = canvas.Canvas('Listado de proveedores.pdf')
+            rpt = canvas.Canvas('Listado de proveedores rpt-'+str(rpt_num)+'.pdf')
 
             rpt.setLineWidth(.3)
             rpt.setFont('Times-Roman', 8)
@@ -110,6 +114,6 @@ class listar_proveedores():
             rpt.drawString(130, self._ct, self.num_prov)
             
             rpt.save()
-            os.startfile('Listado de proveedores.pdf')
+            os.startfile('Listado de proveedores rpt-'+str(rpt_num)+'.pdf')
         except:
             raise

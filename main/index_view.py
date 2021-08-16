@@ -11,7 +11,7 @@ class main_bar():
         self._frameUser = _frameUser
 
     def main_bar_view(self):
-        self.main_title_reg_pro = tk.Label(self._frameLogo, text='MEGAMERCADO', font=('Roboto Mono Bold', 13), bg='#263859', fg='white')
+        self.main_title_reg_pro = tk.Label(self._frameLogo, text='MEGAMERCADO', font=('Roboto Mono Bold', 15), bg='#263859', fg='white')
         
         self.main_title_reg_pro.grid()
         

@@ -46,14 +46,14 @@ class gen_ped():
         self.t2=tk.Label(self._frame, text= Fecha, font=("Roboto Mono",12), bg="white").place(x=440, y=55)
         self.t3=tk.Label(self._frame, text= "", font=("Roboto Mono",12), bg="white")
         self.t3.place(x=427, y=75)
-        self.t4=tk.Label(self._frame, text= "Proveedor:", font=("Roboto Mono",12), bg="white").place(x=249, y=130)
-        self.t5=tk.Label(self._frame, text= "Producto:", font=("Roboto Mono",12), bg="white").place(x=256, y=165)
+        self.t4=tk.Label(self._frame, text= "Proveedor:", font=("Roboto Mono",10), bg="white").place(x=249, y=130)
+        self.t5=tk.Label(self._frame, text= "Producto:", font=("Roboto Mono",10), bg="white").place(x=256, y=165)
         self.t6=tk.Label(self._frame, text= "", font=("Roboto Mono",12), bg="white")
         self.t6.place(x=600, y=165)
-        self.t7=tk.Label(self._frame, text= "Cantidad:", font=("Roboto Mono",12), bg="white").place(x=255, y=200)
+        self.t7=tk.Label(self._frame, text= "Cantidad:", font=("Roboto Mono",10), bg="white").place(x=255, y=200)
         self.t8=tk.Label(self._frame, text= "", font=("Roboto Mono",12), bg="white")
         self.t8.place(x=600, y=200)
-        self.t10=tk.Label(self._frame, text= "Precio:", font=("Roboto Mono",12), bg="white").place(x=520, y=165)
+        self.t10=tk.Label(self._frame, text= "Precio:", font=("Roboto Mono",10), bg="white").place(x=520, y=165)
         self.t12=tk.Label(self._frame, text= "", font=("Roboto Mono",12), bg="white")
         self.t12.place(x=600, y=133)
         self.t13=tk.Label(self._frame, text= '', font=("Roboto Mono",8, BOLD), fg='red', bg="white")
@@ -332,12 +332,28 @@ class gen_ped():
             uni = i[0]
         if uni == None:
             uni = 0
-
+            
         total=uni+cantidad
         sql='UPDATE Almacenes Set Alm_UnidadesDisponibles={} Where Alm_Producto={}'.format(total,valor)
         cur.execute(sql)
         cur.commit()
         cur.close()
+            
+        con = self.conexionBD.cursor()
+        sql_uni_cost = 'Select Prod_CostoUnidad from Productos Where Prod_Codigo={}'.format(valor)
+        con.execute(sql_uni_cost)
+        cost_producto = con.fetchall()
+        _value = 0
+        for a in cost_producto:
+            _value = a[0]
+        
+        valor_inv = int(_value) * total
+        sql_valor_inv = 'UPDATE Almacenes Set Alm_ValorInventario={} Where Alm_Producto={}'.format(valor_inv, valor)
+        con.execute(sql_valor_inv)
+        con.commit()
+        con.close()
+
+    
 
     def limpiarTodo(self):
         self.ComboBOXProv.set('')
