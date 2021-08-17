@@ -31,10 +31,10 @@ class listar_proveedores():
 
 
     def show_list_prov(self):
-        self.tree_Table = ttk.Treeview(self._frame, height=13, columns=('#1', '#2', '#3', '#4', '#5', '#6'), show='headings', style='estilo_prov.Treeview')
+        self.tree_Table = ttk.Treeview(self._frame, height=13, columns=('#1', '#2', '#3', '#4', '#5', '#6', '#7'), show='headings', style='estilo_prov.Treeview')
         self.tree_Table.grid(row=3, column=0)
         self.tree_Table.heading('#1', text='Código', anchor='center')
-        self.tree_Table.column('#1', minwidth=0, width=157, stretch='NO')
+        self.tree_Table.column('#1', minwidth=0, width=100, stretch='NO')
         self.tree_Table.heading('#2', text='Nombre', anchor='center')
         self.tree_Table.column('#2', minwidth=0, width=157, stretch='NO')
         self.tree_Table.heading('#3', text='Dirección', anchor='center')
@@ -42,9 +42,11 @@ class listar_proveedores():
         self.tree_Table.heading('#4', text='RNC/Cédula', anchor='center')
         self.tree_Table.column('#4', minwidth=0, width=100, stretch='NO')
         self.tree_Table.heading('#5', text='Teléfono', anchor='center')
-        self.tree_Table.column('#5', minwidth=0, width=130, stretch='NO')
+        self.tree_Table.column('#5', minwidth=0, width=90, stretch='NO')
         self.tree_Table.heading('#6', text='Tipo', anchor='center')
-        self.tree_Table.column('#6', minwidth=0, width=240, stretch='NO')
+        self.tree_Table.column('#6', minwidth=0, width=245, stretch='NO')
+        self.tree_Table.heading('#7', text='Estatus', anchor='center')
+        self.tree_Table.column('#7', minwidth=0, width=93, stretch='NO')
         
         style = ttk.Style()
         style.configure('Treeview.Heading', font=('Roboto Mono Bold', 9))
@@ -94,8 +96,9 @@ class listar_proveedores():
             rpt.drawString(160, 650, 'Direccion')
             rpt.drawString(250, 650, 'RNC/Cedula')
             rpt.drawString(330, 650, 'Telefono')
-            rpt.drawString(410, 650, 'Tipo')
-            rpt.line(30, 645, 500, 645)
+            rpt.drawString(380, 650, 'Tipo')
+            rpt.drawString(510, 650, 'Estatus')
+            rpt.line(30, 645, 540, 645)
 
             self.count = 630
             for prods in self._prov:
@@ -104,7 +107,8 @@ class listar_proveedores():
                 rpt.drawString(170, self.count, str(prods[1]))
                 rpt.drawString(250, self.count, str(prods[5]))
                 rpt.drawString(320, self.count, str(prods[4]))
-                rpt.drawString(420, self.count, str(prods[3]))
+                rpt.drawString(380, self.count, str(prods[3]))
+                rpt.drawString(510, self.count, str(prods[6]))
                 self.count = self.count - 10
 
             

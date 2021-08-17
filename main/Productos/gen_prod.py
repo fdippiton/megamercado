@@ -1,9 +1,11 @@
 
+import re
 import tkinter as tk
 from tkinter import Label, messagebox
 from tkinter import Message, ttk
 from tkinter.constants import S
 from tkinter.font import families
+from typing import Text
 from fonts import *
 import pyodbc
 from DB.index import _db
@@ -28,7 +30,7 @@ class reg_prod_view():
         self.Precio_venta = ''
         self.Costo_uni = ''
 
-        self.valid_values = False
+        #self.valid_values = False
 
 
         self.reg_cod = self._frame.register(self.validar_codigo) 
@@ -38,6 +40,16 @@ class reg_prod_view():
         self.reg_cost = self._frame.register(self.validar_costo)
         #self.reg_itbis = self._frame.register(self.validar_itbis)
 
+        self.comment = tk.Label(self._frame, text='', background='White', foreground='#E8222D', font=('Roboto Mono', 8), width=50)
+        self.comment.grid(row=1, column=2, sticky='w', ipady=5)
+        self.valid_name = tk.Label(self._frame, text='', background='white', foreground='#E8222D', font=('Roboto Mono', 8), width=50)
+        self.valid_name.grid(row=2, column=2, sticky='w', ipady=5)
+        self.valid_price = tk.Label(self._frame, text='', background='white', foreground='#E8222D', font=('Roboto Mono', 8), width=50)
+        self.valid_price.grid(row=3, column=2, sticky='w', ipady=5)
+        self.valid_cost = tk.Label(self._frame, text='', background='white', foreground='#E8222D', font=('Roboto Mono', 8), width=50)
+        self.valid_cost.grid(row=5, column=2, sticky='w', ipady=5)
+                    
+        
 
     # vista de registrar producto
     def reg_prod(self):
@@ -48,18 +60,17 @@ class reg_prod_view():
         # Creating Code
         self.code = tk.Label(self._frame, text='Código: ', font=('Roboto Mono', 11), bg='white', width=20, anchor='e')
         self.code.grid(row=1, column=0, sticky='e', pady=7)
-        self.Prod_code  = tk.Entry(self._frame, textvariable=self.Prod_Codigo, width=45, bg='#f2f4f6', validate='all', validatecommand=(self.reg_cod, '%P')).grid(row=1, column=1, sticky='w', padx=5, pady=7, ipady=4)
-        
+        self.Prod_code  = tk.Entry(self._frame, textvariable=self.Prod_Codigo, width=45, bg='#f2f4f6', validate='all', validatecommand=(self.reg_cod, '%S', '%P')).grid(row=1, column=1, sticky='w', padx=5, pady=7, ipady=4)
          # Creating Name
         self.name = tk.Label(self._frame, text='Nombre: ', font=('Roboto Mono', 11), bg='white', width=20, anchor='e')
         self.name.grid(row=2, column=0, sticky='e', pady=7)
-        self.Prod_name = tk.Entry(self._frame, textvariable=self.Prod_Nombre, width=45, bg='#f2f4f6', validate='all', validatecommand=(self.reg_nom, '%P')).grid(row=2, column=1, sticky='w', padx=5, pady=7, ipady=4)
+        self.Prod_name = tk.Entry(self._frame, textvariable=self.Prod_Nombre, width=45, bg='#f2f4f6', validate='all', validatecommand=(self.reg_nom, '%S', '%P')).grid(row=2, column=1, sticky='w', padx=5, pady=7, ipady=4)
 
           
         # Creating Price
         self.sale_price = tk.Label(self._frame, text='Precio de Venta: ', font=('Roboto Mono', 11), bg='white', width=20, anchor='e')
         self.sale_price.grid(row=3, column=0, sticky='e', pady=7)
-        self.Prod_price = tk.Entry(self._frame, textvariable= self.Prod_PrecioVenta, width=45, bg='#f2f4f6', validate='all', validatecommand=( self.reg_price, '%P')).grid(row=3, column=1, sticky='w', padx=5, pady=7, ipady=4)
+        self.Prod_price = tk.Entry(self._frame, textvariable= self.Prod_PrecioVenta, width=45, bg='#f2f4f6', validate='all', validatecommand=( self.reg_price, '%S', '%P')).grid(row=3, column=1, sticky='w', padx=5, pady=7, ipady=4)
 
         # Creating Supplier
         self.supplier = tk.Label(self._frame, text='Proveedor: ', font=('Roboto Mono', 11), bg='white', width=20, anchor='e')
@@ -76,7 +87,7 @@ class reg_prod_view():
         # Creating cost
         self.cost = tk.Label(self._frame, text='Costo de unidad: ', font=('Roboto Mono', 11), bg='white', width=20, anchor='e')
         self.cost.grid(row=5, column=0, sticky='e', pady=7)
-        self.Prod_cost = tk.Entry(self._frame, textvariable=self.Prod_CostoUnidad, width=45, bg='#f2f4f6', validate='all', validatecommand=(self.reg_cost, '%P')).grid(row=5, column=1, sticky='w', padx=5, pady=7, ipady=4)
+        self.Prod_cost = tk.Entry(self._frame, textvariable=self.Prod_CostoUnidad, width=45, bg='#f2f4f6', validate='all', validatecommand=(self.reg_cost, '%S', '%P')).grid(row=5, column=1, sticky='w', padx=5, pady=7, ipady=4)
         
         # Creating itbis
         #self.itbis = tk.Label(self._frame, text='Itbis: ', font=('Roboto Mono', 11), bg='white', width=20, anchor='e')
@@ -89,20 +100,20 @@ class reg_prod_view():
 
     # Guardar formulario en la base de datos
     def _submit(self):
-        if self.valid_values == True:
+        #if self.valid_values == True:
 
-            self.codigo = self.Prod_Codigo.get()
-            self.nameP = self.Prod_Nombre.get()
-            self.price = self.Prod_PrecioVenta.get()
-            self.supplierP = self.Prod_Proveedor.get()
-            self.costo = self.Prod_CostoUnidad.get()
-            #self.itbisP = self.Prod_ITBIS.get()
-            
-           
 
-            self.sql = 'INSERT INTO dbo.Productos(Prod_Codigo, Prod_Nombre, Prod_PrecioVenta, Prod_Proveedor, Prod_CostoUnidad, Prod_Estatus) VALUES (?, ?, ?, ?, ?, ?)'
-            self.sql_alm = 'INSERT INTO dbo.Almacenes(Alm_Producto) VALUES (?)'
             try:
+                self.codigo = self.Prod_Codigo.get()
+                self.nameP = self.Prod_Nombre.get()
+                self.price = self.Prod_PrecioVenta.get()
+                self.supplierP = self.Prod_Proveedor.get()
+                self.costo = self.Prod_CostoUnidad.get()
+                #self.itbisP = self.Prod_ITBIS.get()
+
+
+                self.sql = 'INSERT INTO dbo.Productos(Prod_Codigo, Prod_Nombre, Prod_PrecioVenta, Prod_Proveedor, Prod_CostoUnidad, Prod_Estatus) VALUES (?, ?, ?, ?, ?, ?)'
+                self.sql_alm = 'INSERT INTO dbo.Almacenes(Alm_Producto) VALUES (?)'
                 self.conn_provider = _db()
                 
                 # Obtener codigo de proveedor
@@ -113,8 +124,8 @@ class reg_prod_view():
             except:
                 messagebox.showerror(title='Registro de producto', message='Complete la informacion correctamente')
                 #raise
-        else:
-            messagebox.showerror(title='Registro de producto', message='Complete la informacion correctamente')
+        #else:
+            #messagebox.showerror(title='Registro de producto', message='Complete la informacion correctamente')
 
 
     # Limpiar los campos del formulario
@@ -126,229 +137,107 @@ class reg_prod_view():
         self.Prod_CostoUnidad.set('')
         #self.Prod_ITBIS.set('')
 
+
     # Validacion de codigo
-    def validar_codigo(self, _input):
-        self.input = _input
+    def validar_codigo(self, _input, new):
+        if len(new) < 1:
+            self.comment.config(text='Invalido! Esta vacio')
 
-        self.str_input = str(self.input)
-        self.total_dig = len(self.str_input)
-        self.total_digits = 11
-
-        if self.input == '':
-            tk.Label(self._frame, text='Invalido. Esta vacio!', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=1, column=2, sticky='w', ipady=5)
-            self.valid_values = False
-            return True
         else:
-            if self.input.isalpha():
-                    tk.Label(self._frame, text='No se aceptan letras', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=1, column=2, sticky='w', ipady=5)
-                    self.valid_values = False
-                    return True
-            else: 
-                if self.input.isdigit():
-                    if self.total_dig < self.total_digits or self.total_dig > self.total_digits:
-                        tk.Label(self._frame, text='Deben ser 11 digitos', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=1, column=2, sticky='w', ipady=5)
-                        self.valid_values = False
-                        return True
-                    elif self.total_dig == self.total_digits:
-                        self.new_conn = _db()
-                        self.new_conn.validate_code(self.input, self._frame)
-                        self.value = self.new_conn.no_duplicate()
-                        if self.value == 1:
-                            self.valid_values = True
-                        else:
-                            self.valid_values = False
-                        return True
-                else: 
-                    tk.Label(self._frame, text='No se aceptan letras', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=1, column=2, sticky='w', ipady=5)
-                    self.valid_values = False
-                    return False
+            self.new_conn = _db()
+            self.new_conn.validate_code(new, self._frame)
+            self.value = self.new_conn.no_duplicate()
+            if self.value == 1:
+                self.comment.config(text='')
+            else:
+                self.comment.config(text='Se encuentra registrado')
+            
+            if len(new) > 11:
+                return False
+            else:
+                self.comment.config(text='')
+        return _input.isdecimal()
 
     # Validacion de nombre
-    def validar_nombre(self, _input):
-        self.input = _input
-        self.len_input = len(self.input)
-
-        self._empty = tk.Label(self._frame, text='Invalido. Esta vacio!', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50)
-        self._full = tk.Label(self._frame, text='Correcto!', background='#EAEAEA', font=('Roboto Mono', 8), width=50)
-
-        if self.input == '':
-            self._empty.grid(row=2, column=2, sticky='w', ipady=5)
-            self.valid_values = False
-            return True
+    def validar_nombre(self, _input, new):
+        if len(new) < 1:
+            self.valid_name.config(text='Invalido! Esta vacio')
         else:
-            self._full.grid(row=2, column=2, sticky='w', ipady=5)
-            self.valid_values = True
-            return True
+            self.valid_name.config(text='')
+        #return False
+        return _input.isalnum()
 
-    # Validacion de precio
-    def validar_precio(self, _input):
-        self.input = _input
-        self.Precio_venta = self.input
-
-        self.uni_cost = ''
-
-        if self.Costo_uni == '':
-            self.Costo_uni = 0
-            self.uni_cost = self.Costo_uni
-        else:
-            self.uni_cost = int(self.Costo_uni)
-
-       
-        if self.input == '':
-            tk.Label(self._frame, text='Invalido. Esta vacio!', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=3, column=2, sticky='w', ipady=5)
-            self.valid_values = False
-            return True
-            
-        else:
-            if self.input.isdecimal():
-                self.num = int(self.input)
-
-                if self.num == 0:
-                    tk.Label(self._frame, text='El precio no puede ser cero', background='#EAEAEA', font=('Roboto Mono', 8), foreground='#E8222D', width=50).grid(row=3, column=2, sticky='w', ipady=5)
-                    self.valid_values = False
-                    return True
-                else:
-                    if self.num  <= self.uni_cost:
-                        print(self.num)
-                        print(type(self.num))
-                        print(self.uni_cost)
-                        print(type(self.uni_cost))
-                        tk.Label(self._frame, text='El precio de venta no \n puede ser menor que el costo', background='#EAEAEA', font=('Roboto Mono', 8), foreground='#E8222D', width=50).grid(row=3, column=2, sticky='w', ipady=5)
-                        self.valid_values = False
-                        return True
-                    else:
-                        tk.Label(self._frame, text='Correcto', background='#EAEAEA', font=('Roboto Mono', 8), width=50).grid(row=3, column=2, sticky='w', ipady=5)
-                        self.valid_values = True
-                        return True     
-            else:
-                tk.Label(self._frame, text='No se aceptan letras', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=3, column=2, sticky='w', ipady=5)
-                self.valid_values = False
-                return True
-    """
-    def validar_precio(self, _input):
-        self.input = _input
-        self.Precio_venta = self.input
-
-        self.uni_cost = ''
-
-        if self.Costo_uni == '':
-            self.Costo_uni = 0
-            self.uni_cost = self.Costo_uni
-        else:
-            self.uni_cost = int(self.Costo_uni)
-
-       
-        if self.input == '':
-            tk.Label(self._frame, text='Invalido. Esta vacio!', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=3, column=2, sticky='w', ipady=5)
-            self.valid_values = False
-            return True
-            
-        else:
-            if self.input.isdecimal():
-                self.num = int(self.input)
-
-                if self.num == 0:
-                    tk.Label(self._frame, text='El precio no puede ser cero', background='#EAEAEA', font=('Roboto Mono', 8), foreground='#E8222D', width=50).grid(row=3, column=2, sticky='w', ipady=5)
-                    self.valid_values = False
-                    return True
-                else:
-                    if (self.num - (self.num * 0.18)) <= self.uni_cost:
-                        print(self.num)
-                        print(type(self.num))
-                        print(self.uni_cost)
-                        print(type(self.uni_cost))
-                        tk.Label(self._frame, text='El precio de venta mas itbis no \n puede ser menor que el costo', background='#EAEAEA', font=('Roboto Mono', 8), foreground='#E8222D', width=50).grid(row=3, column=2, sticky='w', ipady=5)
-                        self.valid_values = False
-                        return True
-                    else:
-                        tk.Label(self._frame, text='Correcto', background='#EAEAEA', font=('Roboto Mono', 8), width=50).grid(row=3, column=2, sticky='w', ipady=5)
-                        self.valid_values = True
-                        return True     
-            else:
-                tk.Label(self._frame, text='No se aceptan letras', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=3, column=2, sticky='w', ipady=5)
-                self.valid_values = False
-                return True
 
     
-    # Validacion de proveedor
-    def validar_proveedor(self, _input):
-        self.input = _input
+    # Validar precio
+    def validar_precio(self, _input, new):
+        # Precio de venta
+        self.Precio_venta = new
+        self.uni_cost = ''
 
-        if self.input == '':
-            tk.Label(self._frame, text='Invalido. Esta vacio!', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=4, column=2, sticky='w', ipady=5)
-            self.valid_values = False
-            return True
-        else:
-            if not self.input.isdecimal():
-                tk.Label(self._frame, text='Correcto!', background='#EAEAEA', font=('Roboto Mono', 8), width=50).grid(row=4, column=2, sticky='w', ipady=5)
-                self.valid_values = True
-                return True
+        try:
+            if self.Costo_uni == '':
+                self.Costo_uni = 0
+                self.uni_cost = self.Costo_uni
             else:
-                tk.Label(self._frame, text='Invalido. Contiene números', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=4, column=2, sticky='w', ipady=5)
-                self.valid_values = False
-                return True
-    """
-
-    # Validacion de costo
-    def validar_costo(self, _input):
-        self.input = _input
-        self.sale_price = 0
-
-        if self.Precio_venta == '':
-            self.Precio_venta = 0
-            self.sale_price = int(self.Precio_venta)
-        else:
-            self.sale_price = int(self.Precio_venta)
-            #print(type(self.sale_price))
-
-        self.Costo_uni = self.input
+                self.uni_cost = int(self.Costo_uni)
+            
         
-        if self.input == '':
-            tk.Label(self._frame, text='Invalido. Esta vacio!', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=5, column=2, sticky='w', ipady=5)
-            self.valid_values = False
-            return True
-            
-        else:
-            if self.input.isdecimal():
-                self.num = int(self.input)
-                if (self.num <= self.sale_price) and  self.input != '':
-                    tk.Label(self._frame, text='Correcto', background='#EAEAEA', font=('Roboto Mono', 8), width=50).grid(row=5, column=2, sticky='w', ipady=5)
-                    self.valid_values = True
-                    return True
-                else:
-                    tk.Label(self._frame, text='El costo no puede ser \n mayor que el precio de venta', background='#EAEAEA', font=('Roboto Mono', 8), width=50).grid(row=5, column=2, sticky='w', ipady=5)
-                    self.valid_values = False
-                    return True     
+            if len(new) < 1:
+                self.valid_price.config(text='Invalido! Esta vacio')
+                #return False
             else:
-                tk.Label(self._frame, text='No se aceptan letras', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=5, column=2, sticky='w', ipady=5)
-                self.valid_values = False
-                return True
-
-    """
-    # Validacion de itbis
-    def validar_itbis(self, _input):
-        self.input = _input
-        self.itbis_num = 18
-
-        if self.input == '':
-            tk.Label(self._frame, text='Invalido. Esta vacio!', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=6, column=2, sticky='w', ipady=5)
-            self.valid_values = False
-            return True
-            
-        else:
-            if self.input.isdecimal():
-                self.num = int(self.input)
-                if self.num <= self.itbis_num:
-                    tk.Label(self._frame, text='Correcto', background='#EAEAEA', font=('Roboto Mono', 8), width=50).grid(row=6, column=2, sticky='w', ipady=5)
-                    self.valid_values = True
-                    return True
+                self.valid_price.config(text='')
+                self.num = int(new)
+                if self.num == 0:
+                    self.valid_price.config(text='El precio no puede ser cero')
+                    #return False
                 else:
-                    tk.Label(self._frame, text='El itbis no puede ser mayor \n a 18%', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=6, column=2, sticky='w', ipady=5)
-                    self.valid_values = False
-                    return True     
+                    if self.num  <= self.uni_cost:
+                        self.valid_price.config(text='El precio de venta no \n puede ser menor que el costo')
+                    else:
+                        self.valid_price.config(text='')
+                        return True
+        except:
+            self.valid_price.config(text='No se aceptan letras')
+            return False
+                        
+        return _input.isdecimal()
+    
+    
+    def validar_costo(self, _input, new):
+        # Costo de unidad
+        self.Costo_uni = new
+         
+        #self.input = new
+        self.sale_price = 0
+        
+        try:
+            if self.Precio_venta == '':
+                self.Precio_venta = 0
+                self.sale_price = int(self.Precio_venta)
             else:
-                tk.Label(self._frame, text='No se aceptan letras', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=6, column=2, sticky='w', ipady=5)
-                self.valid_values = False
+                self.sale_price = int(self.Precio_venta)
+                
+            
+            if len(new) < 1:
+                self.valid_cost.config(text='Invalido! Esta vacio')
+                #return False
+            else:
+                self.valid_cost.config(text='')
+                #if self.input.isdecimal():
+                self.num = int(new)
+                if (self.num <= self.sale_price) and  self.num != '':
+                    self.valid_cost.config(text='')
+                    #return True
+                else:
+                    self.valid_cost.config(text='El costo no puede ser \n mayor que el precio de venta')
+                #else:
+                #self.valid_cost.config(text='')
                 return True
+        except:
+            self.valid_cost.config(text='No se acepta letras')
+            return False
+    
+        return _input.isdecimal()
 
-    """

@@ -494,11 +494,11 @@ class _db():
     # Obtener los proveedores
     def retrieve_providers(self, _table):
         try:
-            self.sql = '''SELECT Prov_Codigo, Prov_Direccion, Prov_Nombre,  Prov_Tipo, Prov_Telefono, Prov_RNC FROM dbo.Proveedores'''
+            self.sql = '''SELECT Prov_Codigo, Prov_Direccion, Prov_Nombre,  Prov_Tipo, Prov_Telefono, Prov_RNC, Prov_Estatus FROM dbo.Proveedores'''
             self._tree = _table
 
             for row in self._cursor.execute(self.sql):
-                self._tree.insert('', 0, values= (row[0], row[2], row[1], row[5], row[4], row[3]))
+                self._tree.insert('', 0, values= (row[0], row[2], row[1], row[5], row[4], row[3], row[6]))
                 
             self._cursor.close()
             self.conn.close()
@@ -615,9 +615,9 @@ class _db():
             self.values = self.input in self.str_code_array
 
             if self.values:
-                tk.Label(self._frame, text='Se encuentra registrado', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=1, column=2, sticky='w', ipady=5)
+                tk.Label(self._frame, text='Se encuentra registrado', background='white', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=1, column=2, sticky='w', ipady=5)
             else:
-                tk.Label(self._frame, text='Correcto', background='#EAEAEA', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=1, column=2, sticky='w', ipady=5)
+                tk.Label(self._frame, text='', background='white', foreground='#E8222D', font=('Roboto Mono', 8), width=50).grid(row=1, column=2, sticky='w', ipady=5)
                 self.validate = 1
             self._cursor.close()
             self.conn.close()

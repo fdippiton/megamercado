@@ -71,6 +71,10 @@ class gen_factura():
         self.t12.place(x=600, y=133)
         self.t13=tk.Label(self._frame, text= '', font=("Roboto Mono",8, BOLD), fg='red', bg="white")
         self.t13.place(x=125, y=205)
+        self.t14=tk.Label(self._frame, text= 'Almacen:', font=("Roboto Mono",12,BOLD), bg="white")
+        self.t14.place(x=700, y=200)
+        self.t15=tk.Label(self._frame, text= '', font=("Roboto Mono",12), bg="white")
+        self.t15.place(x=785, y=213, anchor=W)
         
         #RESUMENES
         self.Total=0.0
@@ -193,6 +197,7 @@ class gen_factura():
     
     def callback(self,var, indx, mode):
         self.buscarNombreProducto()
+        self.buscarCantidadAlm()
 
     def callbackClientes(self,var, indx, mode):
         self.buscarNombreCliente()
@@ -226,10 +231,12 @@ class gen_factura():
         cur.commit()
         cur.close()
 
+
     def agregar(self):
-        if self.cantidadVar.get()>0:
-          self.t13.config(text='')
-          try:
+        try:
+          cant=int(self.cantidadVar.get())
+          if cant>0:
+            self.t13.config(text='')
             codigo=self.productoCod.get()
             ITBS=float(self.ITBIS)
             cantidad=int(self.cantidadVar.get())
@@ -238,9 +245,9 @@ class gen_factura():
             cur.execute(sql)
             x=cur.fetchall()
             for i in x:
-                subtotal=cantidad*float(i[1])
-                porcentajeITIBIS= subtotal*ITBS
-                Total=subtotal+porcentajeITIBIS
+                subtotal=round(cantidad*float(i[1]),2)
+                porcentajeITIBIS= round(subtotal*ITBS,2)
+                Total=round(subtotal+porcentajeITIBIS,2)
                 self.grid1.insert('',END,values=(codigo,i[0],i[1],cantidad,subtotal,porcentajeITIBIS,Total))
             self.productoCod.set("")
             self.cantidadVar.set(0)
@@ -248,10 +255,12 @@ class gen_factura():
             self.Resumenes()
             cur.commit()
             cur.close()
-          except pyodbc.ProgrammingError:
-            self.ventanaError()
-        elif self.cantidadVar.get()==0:
+          elif cant==0:
             self.t13.config(text='Inserte Cantidad')
+        except pyodbc.ProgrammingError:
+            self.ventanaError()
+        except ValueError:
+            self.ventanaError()
         
 
     def Resumenes(self):
@@ -262,65 +271,72 @@ class gen_factura():
         for child in self.grid1.get_children():
             self.TotalC +=int((self.grid1.item(child, 'values')[3]))
             self.TotalSub +=float((self.grid1.item(child, 'values')[4]))
-            self.TotalITBS +=float((self.grid1.item(child, 'values')[5]))
+            self.TotalITBS +=round(float((self.grid1.item(child, 'values')[5])),2)
             self.TotalT +=float((self.grid1.item(child, 'values')[6]))
         self.valorITBISt.config(text=self.TotalITBS)
         self.valortotalt.config(text=self.TotalT)
         self.valorsubtotalt.config(text=self.TotalSub)
         self.valorcantidadt.config(text=self.TotalC)
 
+
     def AgregarFactura(self):
-        self.TotalC =0.00
-        self.TotalSub =0.00
-        self.TotalITBS =0.00
-        self.TotalT =0.00
         self.clienteCodig=self.Clivar.get()
-        cur=self.conn.cursor()
-        sql='Select * From Clientes where Cli_Codigo={}'.format(self.clienteCodig)
-        cur.execute(sql)
-        x=cur.fetchall()
-        for i in x:
-            clienteN=i[2]
-            ApellidoCliente=i[3]
-            CedulaRNC=i[4]
-            Direccion=i[1]
-            Telefono=i[-2]
-        clienteNombre=clienteN+' '+ApellidoCliente
-        sql="Select TOP 1 Fact_NoFactura from Factura Order by Fact_NoFactura desc"
-        cur.execute(sql)
-        x=cur.fetchall()
-        for i in x:
-            variable=i[0]
-        sql="select count(*) from Factura"
-        cur.execute(sql)
-        x=cur.fetchall()
-        for i in x:
-            variable1=i[0]
-        if variable1==0:
-            self.Factura=1
-        else:
-            self.Factura=variable+1
-    
-        for child in self.grid1.get_children():
-                self.TotalC +=int((self.grid1.item(child, 'values')[3]))
-                self.TotalSub +=float((self.grid1.item(child, 'values')[4]))
-                self.TotalITBS +=float((self.grid1.item(child, 'values')[5]))
-                self.TotalT +=float((self.grid1.item(child, 'values')[6]))
-        if self.TotalC==0.0:
-            self.ventanaInfo()
-        else:
-            sql="INSERT INTO Factura (Fact_NoFactura,Fact_Fecha,Fact_Subtotal,Fact_TotalITBIS,Fact_Total,Fact_Cliente) values(?,?,?,?,?,?)"
+        if self.clienteCodig=="":
+            self.ventanaErrorCli()
+        else: 
             try:
-                cur.execute(sql,self.Factura,self.fecha,self.TotalSub,self.TotalITBS,self.TotalT,self.clienteCodig)
-                self.agregarDetalleFact(self.Factura)
-                self.pdf(self.Factura,self.TotalC,self.TotalSub,self.TotalITBS,self.TotalT,clienteNombre, CedulaRNC, Direccion,Telefono)
-                self.limpiarTodo()
-                self.ventanaExitosa()
-                self.ObtenerNoFactura()
+                self.TotalC =0.00
+                self.TotalSub =0.00
+                self.TotalITBS =0.00
+                self.TotalT =0.00
+                cur=self.conn.cursor()
+                sql='Select * From Clientes where Cli_Codigo={}'.format(self.clienteCodig)
+                cur.execute(sql)
+                x=cur.fetchall()
+                for i in x:
+                    clienteN=i[2]
+                    ApellidoCliente=i[3]
+                    CedulaRNC=i[4]
+                    Direccion=i[1]
+                    Telefono=i[5]
+                clienteNombre=clienteN+' '+ApellidoCliente
+                sql="Select TOP 1 Fact_NoFactura from Factura Order by Fact_NoFactura desc"
+                cur.execute(sql)
+                x=cur.fetchall()
+                for i in x:
+                    variable=i[0]
+                sql="select count(*) from Factura"
+                cur.execute(sql)
+                x=cur.fetchall()
+                for i in x:
+                    variable1=i[0]
+                if variable1==0:
+                    self.Factura=1
+                else:
+                    self.Factura=variable+1
+                for child in self.grid1.get_children():
+                        self.TotalC +=int((self.grid1.item(child, 'values')[3]))
+                        self.TotalSub +=float((self.grid1.item(child, 'values')[4]))
+                        self.TotalITBS +=float((self.grid1.item(child, 'values')[5]))
+                        self.TotalT +=float((self.grid1.item(child, 'values')[6]))
+                if self.TotalC==0.0:
+                    self.ventanaInfo()
+                else:
+                    sql="INSERT INTO Factura (Fact_NoFactura,Fact_Fecha,Fact_Subtotal,Fact_TotalITBIS,Fact_Total,Fact_Cliente) values(?,?,?,?,?,?)"
+                    cur.execute(sql,self.Factura,self.fecha,self.TotalSub,self.TotalITBS,self.TotalT,self.clienteCodig)
+                    self.agregarDetalleFact(self.Factura)
+                    self.pdf(self.Factura,self.TotalC,self.TotalSub,self.TotalITBS,self.TotalT,clienteNombre, CedulaRNC, Direccion,Telefono)
+                    for child in self.grid1.get_children():
+                        self.codigo=int((self.grid1.item(child, 'values')[0]))
+                        self.cantidad=int((self.grid1.item(child, 'values')[3]))
+                        self.quitarUnidadesAlmacen(self.codigo,self.cantidad)
+                    self.limpiarTodo()
+                    self.ventanaExitosa()
+                    self.ObtenerNoFactura()
+                cur.commit()
+                cur.close()
             except pyodbc.ProgrammingError:
-                self.ventanaError()
-        cur.commit()
-        cur.close()
+                self.ventanaInfo()
 
     def agregarDetalleFact(self,Factura):
         cur=self.conn.cursor()
@@ -330,6 +346,20 @@ class gen_factura():
             self.Cantidad=int(self.grid1.item(child, 'values')[3])
             self.NoAlmacen=self.CodigoProducto
             cur.execute(sql,Factura,self.CodigoProducto,self.Cantidad,self.NoAlmacen)
+        cur.commit()
+        cur.close()
+    
+    
+    def quitarUnidadesAlmacen(self,valor,cantidad):
+        cur=self.conn.cursor()
+        sql='Select Alm_UnidadesDisponibles from Almacenes Where Alm_Producto={}'.format(valor)     
+        cur.execute(sql)
+        x=cur.fetchall()
+        for i in x:
+            unidades=i[0]
+        total=unidades-cantidad
+        sql='UPDATE Almacenes Set Alm_UnidadesDisponibles={} Where Alm_Producto={}'.format(total,valor)
+        cur.execute(sql)
         cur.commit()
         cur.close()
     
@@ -349,7 +379,13 @@ class gen_factura():
 
     def ventanaInfo(self):
         messagebox.showinfo(message="Agregue productos para generar factura",title="Informacion")
-        self.pdf()
+        #self.pdf()
+        
+    def ventanaInfo1(self):
+        messagebox.showinfo(message="El producto no existe",title="Informacion")
+
+    def ventanaErrorCli(self):
+        messagebox.showinfo(message="Inserte cliente para generar factura",title="Informacion")
 
     def ventanaExitosa(self):
         messagebox.showinfo(message="Se ha generado la factura de manera exitosa",title="Informacion")
@@ -359,6 +395,19 @@ class gen_factura():
         for row in x:
             self.grid1.delete(row)
         self.Resumenes()
+
+    def buscarCantidadAlm(self):
+        codigo=self.entryProd.get()
+        if codigo=="":
+            self.t15.config(text='0')
+        else:
+            cur=self.conn.cursor()
+            sql='Select Alm_UnidadesDisponibles from Almacenes where Alm_Producto={}'.format(codigo)
+            cur.execute(sql)
+            x=cur.fetchall()
+            for i in x:
+                self.t15.config(text=str(i[0]))
+    
     #CREATE PDF
     def pdf(self,Factura,TotalCantidad, TotalSub, TotalITBIS,TotalT,clienteNombre, CedulaRNC, Direccion,Telefono):
         lista=list()
@@ -386,6 +435,7 @@ class gen_factura():
         stylep= ParagraphStyle('stylep',spaceBefore=6, alignment=TA_CENTER)
         elems.append(paragraph.Paragraph("MEGAMERCADO",stylep))
         elems.append(paragraph.Paragraph(self.fecha,stylep))
+        elems.append(paragraph.Paragraph('No. Factura: '+ str(Factura),stylep))
         elems.append(paragraph.Paragraph("Cliente: "+ clienteNombre + ' Cedula/RNC: ' +  str(CedulaRNC),stylep))
         elems.append(paragraph.Paragraph("Direccion: " + str(Direccion)+' Telefono: ' + str(Telefono),stylep))
         elems.append(table)

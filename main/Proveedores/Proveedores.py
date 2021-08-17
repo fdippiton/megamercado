@@ -213,6 +213,8 @@ class Ui_MainWindow(object):
                         self.ventanaError1_1()
                 elif len(self.lineEdit_6.text())!=10:
                         self.ventanaError3()
+                elif int(RnC[:3])>402 or int(RnC)<1:
+                        self.ventanaErrorRNC()
                 elif len(self.lineEdit_8.text())!=11:
                         self.ventanaError4()
                 elif telefono[:3] not in telefonos:
@@ -486,6 +488,14 @@ font-weight: bold;}
                 msg= QMessageBox()
                 msg.setWindowTitle("Error")
                 msg.setText("El telefono "+ self.lineEdit_6.text()+ " no es existe")
+                msg.setWindowIcon(QIcon('tienda.png'))
+                msg.setIcon(QMessageBox.Warning)
+                msg.exec_()
+                
+    def ventanaErrorRNC(self):
+                msg= QMessageBox()
+                msg.setWindowTitle("Error")
+                msg.setText("El RNC "+ self.lineEdit_6.text()+ " no existe")
                 msg.setWindowIcon(QIcon('tienda.png'))
                 msg.setIcon(QMessageBox.Warning)
                 msg.exec_()

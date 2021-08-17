@@ -26,33 +26,6 @@ from tkinter import filedialog
 import os
 import subprocess
 
-""" Definir los frames con la estructura siguiente:
-
-        self.NombreFrame = tk.Frame(self.main_win)
-        self.NombreFrame.grid(column=1, row=1) Si es un frame dentro content
-        self.NombreFrame.grid(column=#, row=#) Si es otro tipo de frame
-
-    Importar los modulos
-    from NombreCarpeta.NombreArchivo import nombreFuncion as abreviacion
-    Ejemplo:  from Productos.gen_prod import reg_prod_view as rp
-
-    Creacion de funciones para mostrar los modulos
-
-    NombreFrame es el lugar en donde se colocara el contenido
-    def NombreFuncion(self):
-        self.NombreFrame.grid_forget()  #Para limpiar el contenido anterior
-        self.NombreFrame.grid()         #Para mostrar el contenido nuevo en ese espacio
-        self._reg = rp(self.NombreFrame) # Instanciar la clase o modulo
-        self._reg.reg_prod()                   # Llamar metodo de la clase
-
-    Ejemplo: 
-    def show_reg_prod(self):
-        self.content_main_page.grid_forget()
-        self.content_main_page.grid()
-        self._reg = rp(self.content_main_page)
-        self._reg.reg_prod()
-
-"""
 class App_main:
     def __init__(self, _frame):
         self._frame = _frame
@@ -60,21 +33,21 @@ class App_main:
     # Page Main Frames
     def main_(self):
             # Contenedor de la pagina principal
-        self.main_page_container = tk.Frame(self._frame, width=1200, height=600, bg='#263859')
+        self.main_page_container = tk.Frame(self._frame, width=1200, height=600, bg='#22577a')
         self.main_page_container.grid()
 
             # Contenedor del logo 'MEGAMERCADO' de la barra superior
-        self.top_bar_logo = tk.Frame(self.main_page_container, width=200, height=30, bg='#263859')
+        self.top_bar_logo = tk.Frame(self.main_page_container, width=200, height=30, bg='#22577a')
         self.top_bar_logo.grid(row=0, column=0, pady=24)
             
             # Contendor de la barra superior 
-        self.top_bar_user = tk.Frame(self.main_page_container, width=1000, height=30, bg='#263859')
+        self.top_bar_user = tk.Frame(self.main_page_container, width=1000, height=30, bg='#22577a')
         self.top_bar_user.grid(row=0, column=1, sticky='e', padx=20)
 
             # Contenedor del Menu 
-        self.menu_frame = tk.Frame(self.main_page_container, width=200, height=570, bg='#263859')
+        self.menu_frame = tk.Frame(self.main_page_container, width=200, height=570, bg='#22577a')
         self.menu_frame.grid(row=1, column=0, sticky='n', pady=30)
-
+        # #17255a
             # Contenedor del contenido principal - Main content
         self.main_content = tk.Frame(self.main_page_container, width=1000, height=570, bg='white')
         self.main_content.grid(row=1, column=1)
@@ -127,7 +100,7 @@ class App_main:
         self.menu_ven.menu.add_checkbutton(label='Reporte de ventas', variable=self.rpt_ven,  font=('Roboto Mono', 9), command=self.show_rpt_ventas)
 
         # Facturacion
-        self.menu_fac = tk.Menubutton(self.menu_frame, text='Facturacion', relief=RAISED, font=('Roboto Mono Semibold', 10), borderwidth=2)
+        self.menu_fac = tk.Menubutton(self.menu_frame, text='Facturación', relief=RAISED, font=('Roboto Mono Semibold', 10), borderwidth=2)
         self.menu_fac.grid( pady=10, ipadx=27, ipady=5)
 
         self.menu_fac.menu = tk.Menu(self.menu_fac, tearoff=0)
@@ -150,7 +123,7 @@ class App_main:
     def ImageLogo(self):
         self.frame1 = tk.Frame(self.main_content, bg='white', width=550)
         self.frame1.place(relx=0, rely=0, relwidth=1, relheight=1)
-        self.label1 = tk.Label(self.frame1,text="MEGAMERCADO", font=('Roboto Mono', 25), bg='white', foreground='#dadada').place(relx=0.65, rely=0.75)
+        self.label1 = tk.Label(self.frame1,text="MEGAMERCADO 🛒", font=('Roboto Mono', 25), bg='white', foreground='#dadada').place(relx=0.65, rely=0.75)
         self.label2 = tk.Label(self.frame1,text="Calidad y Confianza", font=('Roboto Mono', 13), bg='white', foreground='#dadada').place(relx=0.67, rely=0.83)
     
 
@@ -262,9 +235,6 @@ class App_main:
     
     def start_prov(self):
         os.system('Proveedores.exe')
-
-
-
 
     # Limpiar el main-content frame principal
     def remove_frames(self):
